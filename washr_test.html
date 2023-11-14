@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruef Laundry Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #333333; /* Dark grey background */
+            color: white;
+        }
+
+        #container {
+            background: rgba(255, 255, 255, 0.2); /* Translucent white box */
+            padding: 20px;
+            border-radius: 10px;
+            margin: auto;
+            margin-top: 50px;
+            width: 80%;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Arial Black', Arial, sans-serif;
+            font-size: 36px;
+            margin: 0;
+        }
+
+        #data-container {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            width: 12.5%; /* 1/8th of the screen width */
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .true {
+            background-color: #f08080 ; /* Pastel green */
+        }
+
+        .false {
+            background-color:#90ee90; /* Pastel red */
+        }
+
+        p {
+            font-family: 'Arial Narrow', Arial, sans-serif;
+            font-weight: 100;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Ruef Laundry Room</h1>
+        <!-- Initially, no specific class is set -->
+        <div id="data-container">
+            <p>Washing Machine 1</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
+        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoUhsyJSVEZeZMUFmIVipZcxB7i_ATZhE",
+            authDomain: "spotr-22162.firebaseapp.com",
+            projectId: "spotr-22162",
+            databaseURL: "https://spotr-22162-default-rtdb.firebaseio.com",
+            storageBucket: "spotr-22162.appspot.com",
+            messagingSenderId: "41387641268",
+            appId: "1:41387641268:web:36381f5c98313739168ae1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        // Reference to the Firebase database
+        const database = getDatabase(app);
+        const finalResultRef = ref(database, 'final_result');
+
+        function updateDataContainer(finalResult) {
+            const dataContainer = document.getElementById('data-container');
+            const washingMachineText = "<p>Washing Machine 1</p>";
+
+            dataContainer.innerHTML = washingMachineText;
+
+            // Add or remove classes based on the final result
+            dataContainer.classList.remove('false', 'true');
+
+            if (finalResult !== undefined) {
+                dataContainer.classList.add(finalResult ? 'true' : 'false');
+            } else {
+                console.error('Undefined finalResult received.');
+            }
+        }
+
+        function fetchData() {
+            console.log('Fetching data...');
+            onValue(finalResultRef, (snapshot) => {
+                console.log('Snapshot:', snapshot.val());
+                
+                // Extract the final_result from the snapshot
+                const finalResultObject = snapshot.val();
+                
+                // Assuming final_result is a boolean property in the object
+                const finalResult = finalResultObject.final_result;
+
+                // Display "Washing Machine 1" on the webpage with color coding
+                updateDataContainer(finalResult);
+            }, {
+                onlyOnce: true
+            });
+        }
+
+        // Fetch data initially
+        fetchData();
+
+        // Fetch data every 15 seconds
+        setInterval(fetchData, 15000);
+
+        // Listen for real-time updates
+        onValue(finalResultRef, (snapshot) => {
+            const finalResultObject = snapshot.val();
+            const finalResult = finalResultObject.final_result;
+            console.log('Real-time Update - Final Result:', finalResult);
+
+            // Update the data container with color coding
+            updateDataContainer(finalResult);
+        });
+    </script>
+</body>
+</html>
