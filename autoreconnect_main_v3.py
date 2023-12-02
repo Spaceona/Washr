@@ -60,7 +60,7 @@ def attemptConnection (ssid, password):
                 print("IP Address:", wifi.ifconfig()[0])
         except Exception as e:
             print("Failed to reconnect:", e)
-            sleep(5)
+            sleep(2)
             continue
 
 while True:
