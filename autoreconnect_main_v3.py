@@ -46,41 +46,25 @@ def checkConnection():
     
 #used to reconnect to internet if device is disconnected
 def attemptConnection (ssid, password):
-    if checkConnection() == False:
+    if not checkConnection():
         print("Offline. Attempting to reconnect...")
         try:
-            wifi.connect(ssid, password)
             reconnect_attempts = 0
-            while not wifi.isconnected() and reconnect_attempts < 10:
+            while not checkConnection() and reconnect_attempts < 10:
+                wifi.connect(ssid, password)
                 print("Trying to reconnect...")
                 reconnect_attempts += 1
-                sleep(1)
-            if wifi.isconnected():
+                sleep(15)
+            if checkConnection():
                 print("Reconnected to Wi-Fi")
                 print("IP Address:", wifi.ifconfig()[0])
         except Exception as e:
             print("Failed to reconnect:", e)
-            sleep(2)
+            sleep(5)
             continue
 
 while True:
-    if not wifi.isconnected():
-        print("Offline. Attempting to reconnect...")
-        try:
-            wifi.connect(ssid, password)
-            reconnect_attempts = 0
-            while not wifi.isconnected() and reconnect_attempts < 10:
-                print("Trying to reconnect...")
-                reconnect_attempts += 1
-                sleep(1)
-            if wifi.isconnected():
-                print("Reconnected to Wi-Fi")
-                print("IP Address:", wifi.ifconfig()[0])
-        except Exception as e:
-            print("Failed to reconnect:", e)
-            sleep(2)
-            continue
-
+    attemptConnection(ssid, password);
     try:
         ax = round(imu.accel.x, 2)
         ay = round(imu.accel.y, 2)
