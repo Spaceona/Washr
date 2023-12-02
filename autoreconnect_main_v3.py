@@ -64,7 +64,6 @@ def attemptConnection (ssid, password):
             continue
 
 while True:
-    attemptConnection(ssid, password);
     try:
         ax = round(imu.accel.x, 2)
         ay = round(imu.accel.y, 2)
@@ -108,7 +107,10 @@ while True:
                 print(response.text)
                 response.close()
             except Exception as e:
-                print("Failed to send final_result:", e)
+                if not checkConnection():
+                    attemptConnection(ssid, password)
+                else:
+                    print("Failed to send final_result:", e)
 
             true_count = 0
             false_count = 0
