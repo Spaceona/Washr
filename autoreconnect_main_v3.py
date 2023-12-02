@@ -34,6 +34,35 @@ password = "qwertyuiop"
 wifi.active(True)
 print("Connecting to Wi-Fi...")
 
+#declaring the functions
+#checkConnection (ssid, password)
+#attemptConnection (ssid, password) 
+
+#Checks the status of the devices connection
+def checkConnection():
+    if wifi.isconnected():
+        return True
+    return False
+    
+#used to reconnect to internet if device is disconnected
+def attemptConnection (ssid, password):
+    if checkConnection() == False:
+        print("Offline. Attempting to reconnect...")
+        try:
+            wifi.connect(ssid, password)
+            reconnect_attempts = 0
+            while not wifi.isconnected() and reconnect_attempts < 10:
+                print("Trying to reconnect...")
+                reconnect_attempts += 1
+                sleep(1)
+            if wifi.isconnected():
+                print("Reconnected to Wi-Fi")
+                print("IP Address:", wifi.ifconfig()[0])
+        except Exception as e:
+            print("Failed to reconnect:", e)
+            sleep(2)
+            continue
+
 while True:
     if not wifi.isconnected():
         print("Offline. Attempting to reconnect...")
