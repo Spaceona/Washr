@@ -110,7 +110,7 @@ while True:
                 if not checkConnection():
                     attemptConnection(ssid, password)
                 else:
-                    print("Failed to send final_result:", e)
+                    print("Error: unrelated to connection", e) 
 
             true_count = 0
             false_count = 0
