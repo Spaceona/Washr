@@ -44,6 +44,16 @@ def checkConnection():
     if wifi.isconnected():
         return True
     return False
+
+
+# Function to get accelerometer and gyroscope data
+def get_imu_data():
+    ax, ay, az = imu.accel.x, imu.accel.y, imu.accel.z
+    gx, gy, gz = imu.gyro.x, imu.gyro.y, imu.gyro.z
+    return {
+        'accelerometer': {'x': ax, 'y': ay, 'z': az},
+        'gyroscope': {'x': gx, 'y': gy, 'z': gz}
+    }
     
 #used to reconnect to internet if device is disconnected
 def attemptConnection (ssid, password):
@@ -100,8 +110,9 @@ while True:
 
             # Send final_result over Wi-Fi
             try:
-                final_result_url = 'https://api.spaceona.com/update/lafayette.edu/watsonhall/washer/0/'+(str(final_result)).lower()+'/NpLvwbWzkgrpq2UZem9TbfN4s6gcBTiNuaoqA3Ap9S9csrEp'
-                final_result_post = requests.post(final_result_url)
+                final_result_url = 'https://api.spaceona.com/update/lafayette.edu/watsonhall/washer/0/'+(str(final_result)).lower()+'?token=NpLvwbWzkgrpq2UZem9TbfN4s6gcBTiNuaoqA3Ap9S9csrEp'
+                headers = {'Content-Type': 'application/json'}
+                final_result_post = urequests.post(url, data=json.dumps(get_imu_data), headers=headers)
                 print(final_result_post)
             except Exception as e:
                 if not checkConnection():
