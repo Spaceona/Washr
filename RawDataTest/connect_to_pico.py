@@ -1,5 +1,8 @@
 #Credit to Shilleh on Youtube for the code
 import serial
+import time
+
+start_time = time.time()
 
 # Configure the serial connection
 port = "COM4" #Change this to your serial connection. Will be OS dependent
@@ -11,7 +14,7 @@ destination_file = open("rawdata.txt", "w")
 data = 1
 stopProgram = 1
 
-destination_file.write("GyroX GyroY GyroZ AccelX AccelY AccelZ \n")
+destination_file.write("Time GyroX GyroY GyroZ AccelX AccelY AccelZ \n")
 
 # Read and write data until the transfer is complete
 while True:
@@ -23,8 +26,9 @@ while True:
     data = serial_connection.readline().decode('utf-8').rstrip()
     if data == b"EOF":
         break
-    print(data)
-    destination_file.write(str(data) + "\n")
+    elapsed_time = time.time() - start_time
+    print(str(elapsed_time) + data)
+    destination_file.write(str(elapsed_time) + str(data) + "\n")
     #data += 1
     #stopProgram += 1
 
