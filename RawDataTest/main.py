@@ -4,6 +4,9 @@ from machine import I2C, Pin
 import time
 import uos
 
+led = Pin("LED", Pin.OUT)
+pinValue = 0
+
 from imu import MPU6050
 
 # need this UART to read from BME and be able to send data to local computer
@@ -15,6 +18,13 @@ imu = MPU6050(i2c)
 
 while True:
     
+    if(pinValue == 0):
+        led.on()
+        pinValue = 1
+    else:  
+        led.off()
+        pinValue = 0
+    
     ax = round(imu.accel.x, 2)
     ay = round(imu.accel.y, 2)
     az = round(imu.accel.z, 2)
@@ -23,5 +33,5 @@ while True:
     gz = round(imu.gyro.z)
     
     
-    print(gx + " " + gy + " " + gz + " " + ax + " " + ay + " " + az)
-    time.sleep(0.3) #Could change this. Just pulled this out of thin air
+    print(str(gx) + " " + str(gy) + " " + str(gz) + " " + str(ax) + " " + str(ay) + " " + str(az))
+    time.sleep(0.001) #Could change this. Just pulled this out of thin air

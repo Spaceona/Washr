@@ -2,7 +2,7 @@
 import machine
 from machine import I2C, Pin
 import time
-from machine import Pin
+#from machine import Pin
 import uos
 
 led = Pin("LED", Pin.OUT)

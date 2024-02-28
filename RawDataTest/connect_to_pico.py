@@ -2,7 +2,7 @@
 import serial
 
 # Configure the serial connection
-port = "COM3" #Change this to your serial connection. Will be OS dependent
+port = "COM4" #Change this to your serial connection. Will be OS dependent
 baudrate = 115200
 serial_connection = serial.Serial(port, baudrate)
 
