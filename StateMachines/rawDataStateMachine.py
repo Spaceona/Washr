@@ -18,7 +18,7 @@ i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
 imu = MPU6050(i2c)
 
 state = 'default'
-timer1 = time.time() #need to change this to utime to get miliseconds and then update the period
+timer1 = utime.ticks_ms() #need to change this to utime to get miliseconds and then update the period
 period = 5
 
 
@@ -59,7 +59,7 @@ def tickFunction():
         state = 'default'
 
 while True:
-    timer2 = time.time()
+    timer2 = utime.ticks_ms()
     
     print(timer1)
     print(timer2)
