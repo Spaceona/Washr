@@ -19,7 +19,7 @@ imu = MPU6050(i2c)
 
 state = 'default'
 timer1 = utime.ticks_ms() #need to change this to utime to get miliseconds and then update the period
-period = 5
+period = 10 #period in miliseconds
 
 
 
@@ -61,9 +61,9 @@ def tickFunction():
 while True:
     timer2 = utime.ticks_ms()
     
-    print(timer1)
-    print(timer2)
-    print(timer2 - timer1)
+    #print(timer1)
+    #print(timer2)
+    #print(timer2 - timer1)
     
     if((timer2 - timer1) >= period):
         tickFunction()
