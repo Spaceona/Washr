@@ -96,7 +96,8 @@ def tickFunction():
     global false_count
     global final_result
     global pinValue
-    print("Starting state: " + state)
+    #print("Starting state: " + state) #Debugging statement
+    
     #State machine code
     if(state == 'default'): #Default state. Used just in case
         #State Transitions
@@ -178,7 +179,7 @@ def tickFunction():
     else:
         #Setting the state machine to the default state if something goes wrong
         state = 'default'
-    print("Next State: " + state)
+    #print("Next State: " + state) #Debugging statement
 
 while True:
     #Calling the timer used to check period
