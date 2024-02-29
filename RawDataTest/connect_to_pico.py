@@ -5,7 +5,7 @@ import time
 start_time = time.time()
 
 # Configure the serial connection
-port = "/dev/cu.usbmodem1101" #Change this to your serial connection. Will be OS dependent
+port = "/dev/cu.usbmodem11101" #Change this to your serial connection. Will be OS dependent
 baudrate = 115200
 serial_connection = serial.Serial(port, baudrate)
 
@@ -31,6 +31,9 @@ while True:
     destination_file.write(str(elapsed_time) + " " + str(data) + "\n")
     #data += 1
     #stopProgram += 1
+    if(elapsed_time > 1980):
+        print("Finishing")
+        break
 
 # Close the files and serial connection
 destination_file.close()
