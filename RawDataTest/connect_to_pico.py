@@ -5,7 +5,7 @@ import time
 start_time = time.time()
 
 # Configure the serial connection
-port = "COM4" #Change this to your serial connection. Will be OS dependent
+port = "/dev/cu.usbmodem1101" #Change this to your serial connection. Will be OS dependent
 baudrate = 115200
 serial_connection = serial.Serial(port, baudrate)
 
@@ -28,7 +28,7 @@ while True:
         break
     elapsed_time = time.time() - start_time
     print(str(elapsed_time) + data)
-    destination_file.write(str(elapsed_time) + str(data) + "\n")
+    destination_file.write(str(elapsed_time) + " " + str(data) + "\n")
     #data += 1
     #stopProgram += 1
 
