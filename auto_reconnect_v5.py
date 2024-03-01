@@ -166,7 +166,7 @@ def tickFunction():
         #State logic
         # Send final_result over Wi-Fi
         try:
-            final_result_url = 'https://api.spaceona.com/update/lafayette.edu/watsonhall/washer/0/'+(str(final_result)).lower()+'?token=NpLvwbWzkgrpq2UZem9TbfN4s6gcBTiNuaoqA3Ap9S9csrEp'
+            url = 'https://api.spaceona.com/update/lafayette.edu/watsonhall/washer/0/'+(str(final_result)).lower()+'?token=NpLvwbWzkgrpq2UZem9TbfN4s6gcBTiNuaoqA3Ap9S9csrEp'
             headers = {'Content-Type': 'application/json'}
             final_result_post = urequests.post(url, data=json.dumps(get_imu_data), headers=headers)
             print(final_result_post)
