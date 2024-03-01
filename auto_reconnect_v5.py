@@ -168,8 +168,9 @@ def tickFunction():
         try:
             url = 'https://api.spaceona.com/update/lafayette.edu/watsonhall/washer/0/'+(str(final_result)).lower()+'?token=NpLvwbWzkgrpq2UZem9TbfN4s6gcBTiNuaoqA3Ap9S9csrEp'
             headers = {'Content-Type': 'application/json'}
-            final_result_post = urequests.post(url, data=json.dumps(get_imu_data), headers=headers)
-            print(final_result_post)
+            final_result_post = urequests.post(url, data=json.dumps(get_imu_data()), headers=headers)
+            print(final_result_post.status_code)
+            print(final_result_post.text)
         except Exception as e:
             if not checkConnection():
                 attemptConnection(ssid, password)
