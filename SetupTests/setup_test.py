@@ -50,3 +50,4 @@ def ap_mode(ssid, password):
     s.close()
       
 ap_mode('PicoTestAP', 'password')
+#Need to figure out how to shut down the ap mode correctly
