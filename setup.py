@@ -9,6 +9,7 @@ import utime
 import requests
 import json
 
+
 # Shows Pi is on by turning on LED when plugged in
 LED = Pin("LED", Pin.OUT)
 LED.on()
@@ -25,19 +26,7 @@ true_count = 0
 false_count = 0
 final_result = False
 
-# Initialize Wi-Fi interface
-wifi = network.WLAN(network.STA_IF)
 
-# Activate Wi-Fi
-wifi.active(True)
-
-# Define the SSID and password of the network
-ssid = "pards"
-password = ""
-
-# Set the Wi-Fi mode to station (client)
-wifi.active(True)
-print("Connecting to Wi-Fi...")
 
 #declaring the functions
 #checkConnection (ssid, password)
@@ -63,6 +52,37 @@ def web_page():
     #Need to get the html to host the webserver
     
 def ap_mode(ssid, password):
+    
+    ap = network.WLAN(network.AP_IF)
+    ap.config(essid=ssid, password=password)
+    ap.active(True)
+    
+    while ap.active() == False:
+        pass
+    print('Ap is active, you can now connect')
+    print('IP address to connect to:: ' ap.ifconfig()[0])
+    
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)   #creating socket object
+    s.bind(('', 80))
+    s.listen(5)
+    
+def ap_disconnect():
+    #Figure out if this is necessary
+    
+def wifi_connect_mode():
+    # Initialize Wi-Fi interface
+    wifi = network.WLAN(network.STA_IF)
+
+    # Activate Wi-Fi
+    wifi.active(True)
+
+    # Define the SSID and password of the network
+    ssid = "pards"
+    password = ""
+
+    # Set the Wi-Fi mode to station (client)
+    wifi.active(True)
+    print("Connecting to Wi-Fi...")
     
     
 #used to reconnect to internet if device is disconnected
