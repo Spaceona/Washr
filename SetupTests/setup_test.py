@@ -11,6 +11,9 @@ with open("secrets.txt", encoding='utf8') as file_object:
     password = data[1][9:]
     api_key = data[2][8:]
     
+with open("startup.txt", encoding='utf8') as startup_page:
+    html = startup_page.read()
+    
 print(data)
 print(ssid)
 print(password)
@@ -19,9 +22,7 @@ print(api_key)
 #Reading from file works, now test the AP mode
 
 def web_page():
-  html = """<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>
-            <body><h1>Hello World</h1></body></html>
-         """
+  global html
   return html
 
 def ap_mode(ssid, password):
@@ -40,14 +41,17 @@ def ap_mode(ssid, password):
     s.listen(5)
     
     while True:
-      conn, addr = s.accept()
-      print('Got a connection from %s' % str(addr))
-      request = conn.recv(1024)
-      print('Content = %s' % str(request))
-      response = web_page()
-      conn.send(response)
-      conn.close()
-    s.close()
+      try:
+        conn, addr = s.accept()
+        print('Got a connection from %s' % str(addr))
+        request = conn.recv(1024)
+        print('Content = %s' % str(request))
+        response = web_page()
+        conn.send(response)
+        conn.close()
+        #Need to figure out how to read the text from the html now.
+      except OSError as e:
+        s.close()
       
 ap_mode('PicoTestAP', 'password')
 #Need to figure out how to shut down the ap mode correctly

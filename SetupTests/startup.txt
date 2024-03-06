@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+</head>
+<body>
+
+<h1>SpaceOna Setup</h1>
+<p>Enter your Wifi credentials and api key here.</p>
+<input type="text" name="SSSID" placeholder="SSID" size="30" required> <br>
+<br>
+<input type="text" name="Password" placeholder="Password" size="30" required> <br>
+<br>
+<input type="text" name="api_key" placeholder="Api Key" size="30" required> <br>
+<br>
+<button type="submit" name="submitButton">
+	Finished
+</button>
+
+</body>
+</html>
