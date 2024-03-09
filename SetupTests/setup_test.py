@@ -34,7 +34,7 @@ def ap_mode(ssid, password):
     while ap.active() == False:
         pass
     print('Ap is active, you can now connect')
-    print('IP address to connect to:: ' + ap.ifconfig()[0])
+    print('IP address to connect to: ' + ap.ifconfig()[0])
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)   #creating socket object
     s.bind(('', 80))
