@@ -65,7 +65,7 @@ def attemptConnection (ssid, password):
         print("Offline. Attempting to reconnect...")
         try:
             reconnect_attempts = 0
-            while not checkConnection() and reconnect_attempts < 10:
+            while not checkConnection():
                 wifi.connect(ssid, password)
                 print("Trying to reconnect...")
                 reconnect_attempts += 1
