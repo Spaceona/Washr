@@ -81,7 +81,7 @@ def attemptConnection (ssid, password):
 #Setting up the state machine
 state = 'default'
 timer1 = utime.ticks_ms() #need to change this to utime to get miliseconds and then update the period
-period = 400 #period in miliseconds
+period = 3000 #period in miliseconds
 
 #Tick function used for the state machine
 def tickFunction():
