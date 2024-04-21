@@ -1,5 +1,7 @@
 #Autoreconnect v4 but using a state machine to handle logic
 
+import micropython
+import gc
 from machine import Pin, I2C
 from imu import MPU6050
 from time import sleep
@@ -105,12 +107,19 @@ state = 'default'
 timer1 = utime.ticks_ms() #need to change this to utime to get miliseconds and then update the period
 period = 3000 #period in miliseconds
 
+num_ticks = 0
+
+
 #Tick function used for the state machine
 def tickFunction():
     #Setting up global variables
     global state
     global pinValue
     #print("Starting state: " + state) #Debugging statement
+    
+    #Setting up the garbage collector to manually run after # cycles
+    global num_ticks
+    
     
     #State machine code
     if(state == 'default'): #Default state. Used just in case
@@ -127,6 +136,14 @@ def tickFunction():
     elif(state == 'transmit'):
         #State Transitions
         state = 'transmit' #repeated transmission
+        
+        #Running the garbage collector every 20 cycles to make sure it doesn't run out of memory
+        if(num_ticks == 20):
+            gc.collect()
+            micropython.mem_info() #printing the memory of the pico to make sure it is good
+            
+        
+        
         
         #State logic
         # Send final_result over Wi-Fi
@@ -153,6 +170,7 @@ def tickFunction():
             red_led.value(0)
             green_led.value(0)
             blue_led.value(1)
+            gc.collect()
         except Exception as e:
             if not checkConnection():
                 attemptConnection(ssid, password)
