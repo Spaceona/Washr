@@ -14,6 +14,18 @@ LED = Pin("LED", Pin.OUT)
 LED.on()
 pinValue = 0
 
+#Setting up the colored LEDs
+#Red connected to GPIO 20
+red_led = Pin(20, Pin.OUT)
+#Green connected to GPIO 21
+green_led = Pin(21, Pin.OUT)
+#Blue connected to GPIO 22
+blue_led = Pin(22, Pin.OUT)
+#Turning off the leds at the start of the program
+red_led.value(0)
+green_led.value(0)
+blue_led.value(0)
+
 i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
 imu = MPU6050(i2c)
 
@@ -62,18 +74,28 @@ def get_imu_data():
 #used to reconnect to internet if device is disconnected
 def attemptConnection (ssid, password):
     if not checkConnection():
+        #Setting the blue and red leds on to indicate a wifi connection error
+        red_led.value(1)
+        green_led.value(0)
+        blue_led.value(1)
         print("Offline. Attempting to reconnect...")
         try:
-            reconnect_attempts = 0
-            while not checkConnection() and reconnect_attempts < 10:
+            while not checkConnection():
                 wifi.connect(ssid, password)
                 print("Trying to reconnect...")
-                reconnect_attempts += 1
                 sleep(1) #Originally was 30 but I changed it
             if checkConnection():
                 print("Reconnected to Wi-Fi")
                 print("IP Address:", wifi.ifconfig()[0])
+                 #setting the blue and green leds to show that it has reconnected
+                red_led.value(0)
+                green_led.value(1)
+                blue_led.value(1)
         except Exception as e:
+            #Setting the red and green leds to indicate a non-connection related error
+            red_led.value(1)
+            green_led.value(1)
+            blue_led.value(0)
             print("Failed to reconnect:", e)
             #sleep(2)
 
@@ -81,7 +103,7 @@ def attemptConnection (ssid, password):
 #Setting up the state machine
 state = 'default'
 timer1 = utime.ticks_ms() #need to change this to utime to get miliseconds and then update the period
-period = 400 #period in miliseconds
+period = 3000 #period in miliseconds
 
 #Tick function used for the state machine
 def tickFunction():
@@ -93,17 +115,26 @@ def tickFunction():
     #State machine code
     if(state == 'default'): #Default state. Used just in case
         #State Transitions
-        state = 'transmit' #Alwasy go to sensor state first
-
+        state = 'transmit' #Alwasy go to transmit state first
+        
+        #setting just the green led to show that it is in the default state
+        red_led.value(0)
+        green_led.value(1)
+        blue_led.value(0)
+        
         #State logic would go here if there was any    
 
     elif(state == 'transmit'):
         #State Transitions
         state = 'transmit' #repeated transmission
-
+        
         #State logic
         # Send final_result over Wi-Fi
         try:
+            
+            #Making sure that the board is connected
+            if not checkConnection():
+                attemptConnection(ssid, password)
             
              #Blinking the LED to show that it is transmitting
             if(pinValue == 0):
@@ -118,10 +149,19 @@ def tickFunction():
             final_result_post = urequests.post(url, data=json.dumps(get_imu_data()), headers=headers)
             print(final_result_post.status_code)
             print(final_result_post.text)
+            #Setting just the blue led to show that it is transmitting correctly
+            red_led.value(0)
+            green_led.value(0)
+            blue_led.value(1)
         except Exception as e:
             if not checkConnection():
                 attemptConnection(ssid, password)
+                
             else:
+                #Setting the red and green leds to indicate a non-connection related error
+                red_led.value(1)
+                green_led.value(1)
+                blue_led.value(0)
                 print("Error: unrelated to connection", e)
     else:
         #Setting the state machine to the default state if something goes wrong
