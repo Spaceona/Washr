@@ -138,7 +138,9 @@ def tickFunction():
         state = 'transmit' #repeated transmission
         
         #Running the garbage collector every 20 cycles to make sure it doesn't run out of memory
+        num_ticks += 1
         if(num_ticks == 20):
+            micropython.mem_info() #printing the memory of the pico to make sure it is good
             gc.collect()
             micropython.mem_info() #printing the memory of the pico to make sure it is good
             
@@ -170,7 +172,6 @@ def tickFunction():
             red_led.value(0)
             green_led.value(0)
             blue_led.value(1)
-            gc.collect()
         except Exception as e:
             if not checkConnection():
                 attemptConnection(ssid, password)
