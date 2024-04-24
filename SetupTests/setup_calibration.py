@@ -56,7 +56,7 @@ elif(setup_complete == 'false' or setup_complete == 'False'):
     time.sleep(4)
     print('MPU is Done Settling')
     
-    calculated_offsets = calibration.gyro_calibration(10)
+    calculated_offsets = calibration.gyro_calibration(100)
     print(calculated_offsets)
     #print(type(calculated_offsets))
     with open("offsets.txt", "w", encoding='utf8') as file_object:
@@ -102,6 +102,6 @@ with open("secrets.txt", "w", encoding='utf8') as file_object:
 
 #Reading from the gyro and printing the new values with the offset
 while(True):
-    print(get_imu_data())
+    #print(get_imu_data())
     print(get_imu_data_calibrated(x_offset, y_offset, z_offset))
-    time.sleep(5)
+    time.sleep(1)
