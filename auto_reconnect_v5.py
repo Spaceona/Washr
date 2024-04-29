@@ -43,6 +43,7 @@ final_result = False
 wifi = network.WLAN(network.STA_IF)
 
 # Activate Wi-Fi
+wifi.active(False)
 wifi.active(True)
 
 # Define the SSID and password of the network
@@ -83,6 +84,8 @@ def attemptConnection (ssid, password):
         print("Offline. Attempting to reconnect...")
         try:
             while not checkConnection():
+                wifi.active(False)
+                wifi.active(True)
                 wifi.connect(ssid, password)
                 print("Trying to reconnect...")
                 sleep(1) #Originally was 30 but I changed it
