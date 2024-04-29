@@ -111,14 +111,9 @@ num_ticks = 0
 
 
 #Tick function used for the state machine
-def tickFunction():
-    #Setting up global variables
-    global state
-    global pinValue
-    #print("Starting state: " + state) #Debugging statement
+def tickFunction(state, pinValue, num_ticks):
     
-    #Setting up the garbage collector to manually run after # cycles
-    global num_ticks
+    #print("Starting state: " + state) #Debugging statement
     
     
     #State machine code
@@ -132,17 +127,22 @@ def tickFunction():
         blue_led.value(0)
         
         #State logic would go here if there was any    
-
+        
+        #Returning the "global" variables"
+        return state, pinValue, num_ticks
+        
     elif(state == 'transmit'):
         #State Transitions
         state = 'transmit' #repeated transmission
         
         #Running the garbage collector every 20 cycles to make sure it doesn't run out of memory
         num_ticks += 1
+        print(num_ticks) #Debugging statement
         if(num_ticks == 20):
             micropython.mem_info() #printing the memory of the pico to make sure it is good
             gc.collect()
             micropython.mem_info() #printing the memory of the pico to make sure it is good
+            num_ticks = 0 #resetting the number of ticks
             
         
         
@@ -182,9 +182,16 @@ def tickFunction():
                 green_led.value(1)
                 blue_led.value(0)
                 print("Error: unrelated to connection", e)
+                
+        #Returning the "global" variables"
+        return state, pinValue, num_ticks
+    
     else:
         #Setting the state machine to the default state if something goes wrong
         state = 'default'
+        
+        #Returning the "global" variables"
+        return state, pinValue, num_ticks
     #print("Next State: " + state) #Debugging statement
 
 while True:
@@ -194,5 +201,5 @@ while True:
     #Checking if the period has elapsed
     if((timer2 - timer1) >= period):
         #Calling the tick function
-        tickFunction()
+        state, pinValue, num_ticks = tickFunction(state, pinValue, num_ticks)
         timer1 = timer2
