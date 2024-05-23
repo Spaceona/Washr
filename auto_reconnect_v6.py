@@ -37,11 +37,15 @@ x_offset = 0
 y_offset = 0
 z_offset = 0
 
+
+
 #Checking if the sensor has been calibrated yet
 with open("secrets.txt", encoding='utf8') as file_object:
     
     data = file_object.read().splitlines()
-    setup_complete = data[0][15:]
+    setup_complete = data[0]
+    print(setup_complete)
+    
 
 if(setup_complete == 'true' or setup_complete == 'True'):
     setup_complete = True
@@ -111,8 +115,8 @@ wifi = network.WLAN(network.STA_IF)
 wifi.active(True)
 
 # Define the SSID and password of the network
-ssid = "pards"
-password = ""
+ssid = "PicoDevNetwork"
+password = "password"
 
 # Set the Wi-Fi mode to station (client)
 wifi.active(True)
@@ -212,6 +216,9 @@ def tickFunction(x_offset, y_offset, z_offet):
                 LED.off()
                 pinValue = 0
             
+            #print(get_imu_data()) #Test print of uncalibrated imu data
+            #print(calibration.get_imu_data_calibrated(x_offset, y_offset, z_offset)) #Test print of calibrated imu data
+            
             url = 'https://api.spaceona.com/update/lafayette.edu/farberhall/washer/0/'+(str(final_result)).lower()+'?token=NpLvwbWzkgrpq2UZem9TbfN4s6gcBTiNuaoqA3Ap9S9csrEp'
             headers = {'Content-Type': 'application/json'}
             final_result_post = urequests.post(url, data=json.dumps(calibration.get_imu_data_calibrated(x_offset, y_offset, z_offset)), headers=headers)
@@ -235,7 +242,6 @@ def tickFunction(x_offset, y_offset, z_offet):
         #Setting the state machine to the default state if something goes wrong
         state = 'default'
     #print("Next State: " + state) #Debugging statement
-
 
 
 while True:
