@@ -21,4 +21,19 @@ void setup(){
     Serial.println(WiFi.localIP());
 }
 
-void loop(){}
+void loop(){
+
+  if(WiFi.status() != WL_CONNECTED){
+    while(WiFi.status() != WL_CONNECTED){
+      Serial.println("\nWifi is offline, trying to reconnect...");
+      WiFi.reconnect();
+      delay(500);
+    }
+    Serial.println("\nWifi has reconnected");
+    Serial.print("Local ESP32 IP: ");
+    Serial.println(WiFi.localIP());
+    
+  }
+
+
+}
