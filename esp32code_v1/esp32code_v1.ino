@@ -37,6 +37,7 @@ const char *test_root_ca =
     "RoMNAmeLm32ELp1pxWsJbeSq2sMJmWv4\n" \
     "-----END CERTIFICATE-----\n";
 
+
 // Setting up the MPU
 Adafruit_MPU6050 mpu;
 
@@ -70,6 +71,8 @@ void setup(){
 
   //Not sure why the cert isnt working, but it does work insecurely
   client.setInsecure();
+
+  //Serial.println(test_root_ca);
 
   //Testing if the certificate is installed correctly
   Serial.println("Testing certificate and connection to server");
@@ -195,7 +198,7 @@ void tickFunction(Adafruit_MPU6050 &mpu, NetworkClientSecure &client, HTTPClient
     // State logic would go here if there was any
     break;
   case Transmit:
-    Serial.println("Entered Transmit stage!");
+    //Serial.println("Entered Transmit stage!");
     // Checking to make sure the wifi is configured
     if (WiFi.status() != WL_CONNECTED) {
       while (WiFi.status() != WL_CONNECTED) {
@@ -208,6 +211,9 @@ void tickFunction(Adafruit_MPU6050 &mpu, NetworkClientSecure &client, HTTPClient
       Serial.println(WiFi.localIP());
     } else {
       
+      Serial.print("Local ESP32 IP: ");
+      Serial.println(WiFi.localIP());
+
       // Transmitting the data
       Serial.println("Starting HTTPS connection...");
       if (!https.begin(client, serverName)) {
