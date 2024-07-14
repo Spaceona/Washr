@@ -41,6 +41,9 @@ const char *test_root_ca =
 // Setting up the MPU
 Adafruit_MPU6050 mpu;
 
+// Setting up the LED
+int led_1 = D10;
+
 // Setting up the wifi client for making HTTPS requests
 NetworkClientSecure client;
 HTTPClient https;
@@ -49,10 +52,14 @@ const char *serverName = "https://api.spaceona.com/update/lafayette.edu/watsonha
 
 void setup(){
 
-  // Setting up the wifi
+  // Setting up the serial
   Serial.begin(115200);
   delay(1000);
 
+  // Setting up the LED
+  pinMode(led_1, OUTPUT);
+
+  // Setting up the wifi
   WiFi.mode(WIFI_STA); // Optional
   WiFi.begin(ssid, password);
   Serial.println("\nConnecting");
@@ -163,7 +170,7 @@ void loop() {
   timer2 = millis();
 
   if ((timer2 - timer1) >= period) {
-    tickFunction(mpu, client, https);
+    tickFunction(mpu, client, https, led_1);
     timer1 = timer2;
   }
 }
@@ -175,7 +182,7 @@ enum States {
 } Sensor_State;
 
 // Setting up the tick function
-void tickFunction(Adafruit_MPU6050 &mpu, NetworkClientSecure &client, HTTPClient &https) {
+void tickFunction(Adafruit_MPU6050 &mpu, NetworkClientSecure &client, HTTPClient &https, int &led_1) {
 
   // Transitions
   switch (Sensor_State)
@@ -198,6 +205,9 @@ void tickFunction(Adafruit_MPU6050 &mpu, NetworkClientSecure &client, HTTPClient
     // State logic would go here if there was any
     break;
   case Transmit:
+
+    digitalWrite(led_1, LOW);
+
     //Serial.println("Entered Transmit stage!");
     // Checking to make sure the wifi is configured
     if (WiFi.status() != WL_CONNECTED) {
@@ -228,7 +238,10 @@ void tickFunction(Adafruit_MPU6050 &mpu, NetworkClientSecure &client, HTTPClient
       Serial.println(httpsResponseCode);
       if (httpsResponseCode <= 0) {
         Serial.println("Failed to send POST request");
+        digitalWrite(led_1, LOW);
         return;
+      } else {
+        digitalWrite(led_1, HIGH);
       }
       Serial.println("");
       
