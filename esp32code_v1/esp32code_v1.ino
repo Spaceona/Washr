@@ -7,10 +7,11 @@
 #include <WiFi.h>
 #include <NetworkClientSecure.h>
 #include <HTTPClient.h>
+#include "wifi_secrets.h"
 
 // Setting up the wifi details
-const char *ssid = "PicoDevNetwork";
-const char *password = "password";
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWORD;
 
 // Setting up the server certificate
 const char *test_root_ca =
@@ -256,7 +257,7 @@ String get_mpu_data(Adafruit_MPU6050 &mpu) {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
   char buffer[200]; // Adjust the size as needed
-  snprintf(buffer, sizeof(buffer), "{\"accelerometer\": {\"z\": %f, \"y\": %f, \"x\": %f}, \"gyroscope\": {\"z\": %f, \"y\": %f, \"x\": %f}}", a.acceleration.z, a.acceleration.y, a.acceleration.x, g.gyro.z, g.gyro.y, g.gyro.x);
+  snprintf(buffer, sizeof(buffer), "{\"accelerometer\":{\"z\":%f,\"y\":%f,\"x\":%f},\"gyroscope\":{\"z\":%f,\"y\":%f,\"x\":%f}}", a.acceleration.z, a.acceleration.y, a.acceleration.x, g.gyro.z, g.gyro.y, g.gyro.x);
   String dataJson = String(buffer);
   Serial.println(dataJson);
   return dataJson;
