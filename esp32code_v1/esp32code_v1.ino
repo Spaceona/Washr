@@ -9,6 +9,8 @@
 #include <HTTPClient.h>
 #include "wifi_secrets.h"
 
+#define FIRMWARE_VERSION "0.1"
+
 // Setting up the wifi details
 const char *ssid = WIFI_SSID;
 const char *password = WIFI_PASSWORD;
