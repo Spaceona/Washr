@@ -148,8 +148,10 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
     sensor_active = false;
     if(above_thresh){
       number_seen++;
-    } else {
-      number_seen--;
+    } else { //Bounding it to 0 so that having the machine idle doesn't make it impossible to detect as active
+      if(!number_seen == 0){
+        number_seen--;
+      }
     }
     break;
   case Active:
