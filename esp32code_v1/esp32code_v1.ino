@@ -236,12 +236,14 @@ void tickFunction(Adafruit_MPU6050 &mpu, NetworkClientSecure &client, HTTPClient
       https.addHeader("Content-Type", "application/json");
       String httpsPostData = get_mpu_data(mpu);
       Serial.println("Sending POST request...");
+      https.setTimeout(5000); //Sets https timeout
       int httpsResponseCode = https.POST(httpsPostData);
       Serial.print("HTTPS Response code: ");
       Serial.println(httpsResponseCode);
       if (httpsResponseCode <= 0) {
         Serial.println("Failed to send POST request");
         digitalWrite(led_1, LOW);
+        Serial.println(https.errorToString(httpsResponseCode)); // Print detailed error message
         return;
       } else {
         digitalWrite(led_1, HIGH);
