@@ -5,6 +5,16 @@
 #include "MPUFunctions.h"
 
 void mpu_init(Adafruit_MPU6050 &mpu, mpu6050_accel_range_t accel_range, mpu6050_gyro_range_t gyro_range, mpu6050_bandwidth_t bandwidth){
+  
+  // Try to initialize!
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+  Serial.println("MPU6050 Found!");
+  
   mpu.setAccelerometerRange(accel_range);
   Serial.print("Accelerometer range set to: ");
   switch (mpu.getAccelerometerRange()) {
@@ -162,7 +172,7 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
 bool motion_detected(Adafruit_MPU6050 &mpu){
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
-  if(abs(a.acceleration.z) >= MPU_ACCEL_Z_THRESH){
+  if(abs(a.acceleration.x) >= MPU_ACCEL_X_THRESH || abs(a.acceleration.y) >= MPU_ACCEL_Y_THRESH){
     return true;
   } else {
     return false;

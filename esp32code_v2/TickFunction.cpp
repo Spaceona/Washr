@@ -70,6 +70,7 @@ void tickFunction(Adafruit_MPU6050 &mpu, const char* server_name, NetworkClientS
       int httpsResponseCode = https.POST(httpsPostData);
       Serial.print("HTTPS Response code: ");
       Serial.println(httpsResponseCode);
+      //Should probably add better error code handling here
       if (httpsResponseCode <= 0) {
         Serial.println("Failed to send POST request");
         digitalWrite(led_1, LOW);
