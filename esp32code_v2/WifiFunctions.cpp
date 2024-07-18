@@ -1,16 +1,18 @@
-#ifndef WIFI_FUNCTION_H
-#define WIFI_FUNCTION_H
-
 #include <Arduino.h>
 #include <WiFi.h>
 #include <NetworkClientSecure.h>
 #include <HTTPClient.h>
+#include <HTTPUpdate.h>
+//Might want to move to the HttpsOTAUpdate library at some point since its part of the official arduino library
 #include "wifi_secrets.h"
 
 // Setting up the wifi details
 const char *ssid = WIFI_SSID;
 const char *password = WIFI_PASSWORD;
 String mac_address;
+
+//Url for the firmware location
+//const char *firmware_url =
 
 // Setting up the server certificate
 const char *test_root_ca =
@@ -77,4 +79,29 @@ void wifi_init(const char* server_name, NetworkClientSecure &client, HTTPClient 
   }
 }
 
-#endif
+//I want to add a feature where I compare the current firmware version to the remote firmware version and only update if it is bigger, but part of that is server side
+//I might also want to have it only update at like 3 in the morning instead of doing it randomly every x hours
+void ota_update(WiFiClient ota_client, String ota_server_url, uint16_t ota_port, String ota_firmware_location){
+  Serial.println("Starting OTA update check");
+
+  t_httpUpdate_return ret = httpUpdate.update(ota_client, ota_server_url, ota_port, ota_firmware_location);
+
+  switch (ret) {
+      case HTTP_UPDATE_FAILED:
+        Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
+        break;
+ 
+      case HTTP_UPDATE_NO_UPDATES:
+        Serial.println("HTTP_UPDATE_NO_UPDATES");
+        break;
+ 
+      case HTTP_UPDATE_OK:
+        Serial.println("HTTP_UPDATE_OK");
+        delay(1000); // Wait a second and restart
+        ESP.restart();
+        break;
+  }
+  
+
+}
+

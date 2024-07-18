@@ -158,7 +158,9 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
     //State logic goes here
     sensor_active = true;
     if(above_thresh){
-      number_seen++;
+      if(number_seen <= debounce_thresh){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
+        number_seen++;
+      }
     } else {
       number_seen--;
     }
