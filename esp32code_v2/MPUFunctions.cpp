@@ -106,7 +106,7 @@ const uint8_t MPU_GYRO_Y_THRESH = 2;
 const uint8_t MPU_GYRO_Z_THRESH = 2;
 
 //Again number is randomly selected should refine through testing
-const uint8_t debounce_thresh = 10;
+const uint8_t debounce_thresh = 30;
 
 bool mpu_tick(Adafruit_MPU6050 &mpu){
 
