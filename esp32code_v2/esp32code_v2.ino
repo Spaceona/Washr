@@ -7,6 +7,7 @@
 #include <WiFi.h>
 #include <NetworkClientSecure.h>
 #include <HTTPClient.h>
+#include <ezTime.h>
 #include "MPUFunctions.h"
 #include "TickFunction.h"
 #include "WifiFunctions.h"
@@ -25,6 +26,9 @@ int led_1 = D10;
 NetworkClientSecure client;
 HTTPClient https;
 
+Timezone myTimezone;
+String zone_name = "America/New_York";
+
 void setup(){
 
   // Setting up the serial
@@ -40,6 +44,8 @@ void setup(){
   //Initializing the Wifi
   wifi_init(server_name, client, https);
 
+  //Setting up the clock
+  setClock(myTimezone, zone_name);
 }
 
 // Setting up the timers for the tick function state machine
@@ -55,10 +61,22 @@ int mpu_period = 100;
 bool in_use;
 
 void loop() {
-  // put your main code here, to run repeatedly:
+
+  // Used for ezTime events
+  events();
+
+  //Updating the tick functions timers
   tick_timer2 = millis();
   mpu_timer2 = millis();
   
+  // Updating the MPUs debouncing state machine
+  if((mpu_timer2 - mpu_timer1) >= mpu_period){
+    in_use = mpu_tick(mpu);
+    //Serial.println("Machine status: ");
+    //Serial.println(in_use);
+    mpu_timer1 = mpu_timer2;
+  }
+
   //If the server takes a long time to respond, it won't call the mpu function so it doesn't update the status correctly. The ESP32C3 doesn't have multithreading, so need to fix that
   if ((tick_timer2 - tick_timer1) >= tick_period){
     //Serial.println("Tick function reached");
@@ -66,12 +84,6 @@ void loop() {
     tick_timer1 = tick_timer2;
   }
 
-  if((mpu_timer2 - mpu_timer1) >= mpu_period){
-    in_use = mpu_tick(mpu);
-    Serial.println("Machine status: ");
-    Serial.println(in_use);
-    mpu_timer1 = mpu_timer2;
-  }
-
 }
+
 

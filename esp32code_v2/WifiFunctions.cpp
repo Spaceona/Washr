@@ -4,6 +4,7 @@
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 //Might want to move to the HttpsOTAUpdate library at some point since its part of the official arduino library
+#include <ezTime.h>
 #include "wifi_secrets.h"
 
 // Setting up the wifi details
@@ -77,6 +78,7 @@ void wifi_init(const char* server_name, NetworkClientSecure &client, HTTPClient 
   } else {
     Serial.println("Connection successful");
   }
+
 }
 
 //I want to add a feature where I compare the current firmware version to the remote firmware version and only update if it is bigger, but part of that is server side
@@ -105,3 +107,13 @@ void ota_update(WiFiClient ota_client, String ota_server_url, uint16_t ota_port,
 
 }
 
+// Set time via NTP, will be used for OTA sync at an offtime. Look into ezTime "setEvent()"
+void setClock(Timezone &time_zone, String timezone_name) {
+  waitForSync();
+
+	Serial.println("UTC: " + UTC.dateTime());
+  time_zone.setLocation(timezone_name);
+  Serial.print("Local time: ");
+  time_zone.setLocation(timezone_name);
+  Serial.println(time_zone.dateTime());
+}
