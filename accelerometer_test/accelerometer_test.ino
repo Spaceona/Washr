@@ -10,6 +10,9 @@
 
 Adafruit_MPU6050 mpu;
 
+// Setting up the LED
+int led_1 = D10;
+
 void setup(void) {
   Serial.begin(115200);
   while (!Serial)
@@ -85,6 +88,8 @@ void setup(void) {
     break;
   }
 
+  pinMode(led_1, OUTPUT);
+
   Serial.println("");
   delay(100);
 }
@@ -153,12 +158,12 @@ bool above_thresh;
 
 //These are just random values. We can change them later (z accel is higher since its experiencing 9.8 g
 // at least in the mounting position of usb port down like we did during the semester)
-const uint8_t MPU_ACCEL_X_THRESH = 2;
-const uint8_t MPU_ACCEL_Y_THRESH = 2;
-const uint8_t MPU_ACCEL_Z_THRESH = 11;
-const uint8_t MPU_GYRO_X_THRESH = 2;
-const uint8_t MPU_GYRO_Y_THRESH = 2;
-const uint8_t MPU_GYRO_Z_THRESH = 2;
+const float MPU_ACCEL_X_THRESH = 0.7;
+const float MPU_ACCEL_Y_THRESH = 11;
+const float MPU_ACCEL_Z_THRESH = 0.20;
+const float MPU_GYRO_X_THRESH = 2;
+const float MPU_GYRO_Y_THRESH = 2;
+const float MPU_GYRO_Z_THRESH = 2;
 
 //Again number is randomly selected should refine through testing
 const uint8_t debounce_thresh = 30;
@@ -202,7 +207,9 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
     // State logic goes here
     sensor_active = false;
     if(above_thresh){
-      number_seen++;
+      if(number_seen <= debounce_thresh){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
+        number_seen++;
+      }
     } else { //Bounding it to 0 so that having the machine idle doesn't make it impossible to detect as active
       if(!number_seen == 0){
         number_seen--;
@@ -213,16 +220,22 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
     //State logic goes here
     sensor_active = true;
     if(above_thresh){
+      digitalWrite(led_1, HIGH);
       if(number_seen <= debounce_thresh){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
         number_seen++;
       }
     } else {
-      number_seen--;
+      digitalWrite(led_1, LOW);
+      if(!number_seen == 0){
+        number_seen--;
+      }
     }
     break;
   default:
     break;
   }
+  Serial.print("Number seen: ");
+  Serial.println(number_seen);
   return sensor_active;
 }
 
@@ -231,9 +244,48 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
 bool motion_detected(Adafruit_MPU6050 &mpu){
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
-  if(abs(a.acceleration.x) >= MPU_ACCEL_X_THRESH || abs(a.acceleration.y) >= MPU_ACCEL_Z_THRESH){
+
+  //Checking if the sensor reads 000, 000, 000 and resetting it
+  if(a.acceleration.x == 0.00 && a.acceleration.y == 0.00 && a.acceleration.z == 0.00){
+    reset_mpu(mpu);
+    mpu.getEvent(&a, &g, &temp);
+  }
+
+  //Checking if the sensor is in use
+  Serial.print("X accel: ");
+  Serial.println(abs(a.acceleration.x));
+  Serial.print("X threshold: ");
+  Serial.println(MPU_ACCEL_X_THRESH);
+  Serial.print("Z accel: ");
+  Serial.println(abs(a.acceleration.z));
+  Serial.print("Z threshold: ");
+  Serial.println(MPU_ACCEL_Z_THRESH);
+  if(abs(a.acceleration.x) >= MPU_ACCEL_X_THRESH || abs(a.acceleration.z) >= MPU_ACCEL_Z_THRESH){
+    Serial.println("Motion detected");
+    digitalWrite(led_1, HIGH);
     return true;
   } else {
+    Serial.println("Motion not detected");
+    digitalWrite(led_1, LOW);
     return false;
   }
+}
+
+// Resets the MPU6050 and reconfigures it with the previous settings
+void reset_mpu(Adafruit_MPU6050 &mpu) {
+  // Get current settings
+  mpu6050_accel_range_t accel_range = mpu.getAccelerometerRange();
+  mpu6050_gyro_range_t gyro_range = mpu.getGyroRange();
+  mpu6050_bandwidth_t bandwidth = mpu.getFilterBandwidth();
+
+  // Reset the MPU6050
+  mpu.reset();
+
+  // Short delay after reset
+  delay(100); // Delay to ensure MPU6050 reset process is completed
+
+  // Set the MPU6050 to the old settings
+  mpu.setAccelerometerRange(accel_range);
+  mpu.setGyroRange(gyro_range);
+  mpu.setFilterBandwidth(bandwidth);
 }

@@ -117,12 +117,12 @@ bool above_thresh;
 
 //These are just random values. We can change them later (z accel is higher since its experiencing 9.8 g
 // at least in the mounting position of usb port down like we did during the semester)
-const uint8_t MPU_ACCEL_X_THRESH = 2;
-const uint8_t MPU_ACCEL_Y_THRESH = 2;
-const uint8_t MPU_ACCEL_Z_THRESH = 11;
-const uint8_t MPU_GYRO_X_THRESH = 2;
-const uint8_t MPU_GYRO_Y_THRESH = 2;
-const uint8_t MPU_GYRO_Z_THRESH = 2;
+const float MPU_ACCEL_X_THRESH = 0.7;
+const float MPU_ACCEL_Y_THRESH = 11;
+const float MPU_ACCEL_Z_THRESH = 0.20;
+const float MPU_GYRO_X_THRESH = 2;
+const float MPU_GYRO_Y_THRESH = 2;
+const float MPU_GYRO_Z_THRESH = 2;
 
 //Again number is randomly selected should refine through testing
 const uint8_t debounce_thresh = 30;
@@ -166,7 +166,9 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
     // State logic goes here
     sensor_active = false;
     if(above_thresh){
-      number_seen++;
+      if(number_seen <= debounce_thresh){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
+        number_seen++;
+      }
     } else { //Bounding it to 0 so that having the machine idle doesn't make it impossible to detect as active
       if(!number_seen == 0){
         number_seen--;
@@ -181,7 +183,9 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
         number_seen++;
       }
     } else {
-      number_seen--;
+      if(!number_seen == 0){
+        number_seen--;
+      }
     }
     break;
   default:
@@ -197,13 +201,13 @@ bool motion_detected(Adafruit_MPU6050 &mpu){
   mpu.getEvent(&a, &g, &temp);
 
   //Checking if the sensor reads 000, 000, 000 and resetting it
-  if(a.acceleration.x == 0 && a.acceleration.y == 0 && a.acceleration.z == 0){
+  if(a.acceleration.x == 0.00 && a.acceleration.y == 0.00 && a.acceleration.z == 0.00){
     reset_mpu(mpu);
     mpu.getEvent(&a, &g, &temp);
   }
 
   //Checking if the sensor is in use
-  if(abs(a.acceleration.x) >= MPU_ACCEL_X_THRESH || abs(a.acceleration.y) >= MPU_ACCEL_Y_THRESH){
+  if(abs(a.acceleration.x) >= MPU_ACCEL_X_THRESH || abs(a.acceleration.z) >= MPU_ACCEL_Z_THRESH){
     return true;
   } else {
     return false;
