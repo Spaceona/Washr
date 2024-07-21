@@ -51,12 +51,12 @@ void setup(){
 // Setting up the timers for the tick function state machine
 int tick_timer1 = 0;
 int tick_timer2 = millis();
-int tick_period = 30000;
+int tick_period = 15000; //In milliseconds
 
 // Setting up the timers for the mpu debounce state machine
 int mpu_timer1 = 0;
 int mpu_timer2 = millis();
-int mpu_period = 100;
+int mpu_period = 100; //In milliseconds
 
 bool in_use;
 

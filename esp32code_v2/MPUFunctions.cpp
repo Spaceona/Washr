@@ -104,12 +104,6 @@ void reset_mpu(Adafruit_MPU6050 &mpu) {
   mpu.setFilterBandwidth(bandwidth);
 }
 
-// Setting the states for the tick function
-enum MPU_States {
-  Start,
-  Debounce,
-  Active
-} MPU_State;
 
 int number_seen;
 bool sensor_active;
@@ -127,11 +121,19 @@ const float MPU_GYRO_Z_THRESH = 2;
 //Again number is randomly selected should refine through testing
 const uint8_t debounce_thresh = 30;
 
+// Setting the states for the tick function
+enum MPU_States {
+  Start,
+  Debounce,
+  Active
+} MPU_State;
+
+
 bool mpu_tick(Adafruit_MPU6050 &mpu){
 
   above_thresh = motion_detected(mpu);
 
-  switch (MPU_State){
+  switch (MPU_State){ //Transitions
     case Start:
       MPU_State = Debounce;
       break;
