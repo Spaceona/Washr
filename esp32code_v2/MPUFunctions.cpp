@@ -85,6 +85,25 @@ String get_mpu_data(Adafruit_MPU6050 &mpu) {
   return dataJson;
 }
 
+// Resets the MPU6050 and reconfigures it with the previous settings
+void reset_mpu(Adafruit_MPU6050 &mpu) {
+  // Get current settings
+  mpu6050_accel_range_t accel_range = mpu.getAccelerometerRange();
+  mpu6050_gyro_range_t gyro_range = mpu.getGyroRange();
+  mpu6050_bandwidth_t bandwidth = mpu.getFilterBandwidth();
+
+  // Reset the MPU6050
+  mpu.reset();
+
+  // Short delay after reset
+  delay(100); // Delay to ensure MPU6050 reset process is completed
+
+  // Set the MPU6050 to the old settings
+  mpu.setAccelerometerRange(accel_range);
+  mpu.setGyroRange(gyro_range);
+  mpu.setFilterBandwidth(bandwidth);
+}
+
 // Setting the states for the tick function
 enum MPU_States {
   Start,
@@ -176,6 +195,14 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
 bool motion_detected(Adafruit_MPU6050 &mpu){
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
+
+  //Checking if the sensor reads 000, 000, 000 and resetting it
+  if(a.acceleration.x == 0 && a.acceleration.y == 0 && a.acceleration.z == 0){
+    reset_mpu(mpu);
+    mpu.getEvent(&a, &g, &temp);
+  }
+
+  //Checking if the sensor is in use
   if(abs(a.acceleration.x) >= MPU_ACCEL_X_THRESH || abs(a.acceleration.y) >= MPU_ACCEL_Y_THRESH){
     return true;
   } else {

@@ -8,5 +8,6 @@ void mpu_init(Adafruit_MPU6050 &mpu, mpu6050_accel_range_t accel_range, mpu6050_
 String get_mpu_data(Adafruit_MPU6050 &mpu);
 bool mpu_tick(Adafruit_MPU6050 &mpu);
 bool motion_detected(Adafruit_MPU6050 &mpu);
+void reset_mpu(Adafruit_MPU6050 &mpu);
 
 #endif
