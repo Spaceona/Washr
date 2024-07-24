@@ -19,8 +19,9 @@ const char *server_name = "https://api.spaceona.com/update/lafayette.edu/watsonh
 // Setting up the MPU
 Adafruit_MPU6050 mpu;
 
-// Setting up the LED
-int led_1 = D10;
+// Setting up the LEDs
+int led_1 = D3;
+int led_2 = D2;
 
 // Setting up the wifi client for making HTTPS requests
 NetworkClientSecure client;
@@ -37,6 +38,7 @@ void setup(){
 
   // Setting up the LED
   pinMode(led_1, OUTPUT);
+  pinMode(led_2, OUTPUT);
 
   //Initializing MPU
   mpu_init(mpu, MPU6050_RANGE_8_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
