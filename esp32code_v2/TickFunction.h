@@ -6,10 +6,10 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include <WiFi.h>
-#include <NetworkClientSecure.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 
 //Tick function for the central logic. Right now just constantly transmits the raw sensor data
-void tickFunction(Adafruit_MPU6050 &mpu, const char* server_name, NetworkClientSecure &client, HTTPClient &https, int &led_1);
+void tickFunction(Adafruit_MPU6050 &mpu, const char* server_name, WiFiClientSecure &client, HTTPClient &https, int &led_1);
 
 #endif

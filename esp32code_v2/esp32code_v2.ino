@@ -5,7 +5,7 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include <WiFi.h>
-#include <NetworkClientSecure.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ezTime.h>
 #include "MPUFunctions.h"
@@ -24,7 +24,7 @@ int led_1 = D3;
 int led_2 = D2;
 
 // Setting up the wifi client for making HTTPS requests
-NetworkClientSecure client;
+WiFiClientSecure client;
 HTTPClient https;
 
 Timezone myTimezone;
@@ -32,9 +32,12 @@ String zone_name = "America/New_York";
 
 void setup(){
 
-  // Setting up the serial
+  // Setting up the Serial
   Serial.begin(115200);
   delay(1000);
+
+  // Setting up the Serial1 for debugging
+  //Serial1.begin(115200, SERIAL_8N1, D7, D6);
 
   // Setting up the LED
   pinMode(led_1, OUTPUT);

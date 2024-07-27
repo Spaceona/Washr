@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <NetworkClientSecure.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 //Might want to move to the HttpsOTAUpdate library at some point since its part of the official arduino library
@@ -42,7 +42,7 @@ const char *test_root_ca =
 
 
 
-void wifi_init(const char* server_name, NetworkClientSecure &client, HTTPClient &https){
+void wifi_init(const char* server_name, WiFiClientSecure &client, HTTPClient &https){
   // Setting up the wifi
   WiFi.mode(WIFI_STA); // Optional
   WiFi.begin(ssid, password);
