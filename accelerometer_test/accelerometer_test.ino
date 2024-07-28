@@ -97,7 +97,7 @@ void setup(void) {
 // Setting up the timers for the mpu debounce state machine
 int mpu_timer1 = 0;
 int mpu_timer2 = millis();
-int mpu_period = 100;
+int mpu_period = 50;
   
 bool in_use;
 
