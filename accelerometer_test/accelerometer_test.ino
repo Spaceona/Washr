@@ -207,7 +207,7 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
     // State logic goes here
     sensor_active = false;
     if(above_thresh){
-      if(number_seen <= debounce_thresh){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
+      if(number_seen <= debounce_thresh+10){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
         number_seen++;
       }
     } else { //Bounding it to 0 so that having the machine idle doesn't make it impossible to detect as active
@@ -221,7 +221,7 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
     sensor_active = true;
     if(above_thresh){
       digitalWrite(led_1, HIGH);
-      if(number_seen <= debounce_thresh){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
+      if(number_seen <= debounce_thresh+10){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
         number_seen++;
       }
     } else {
@@ -256,11 +256,15 @@ bool motion_detected(Adafruit_MPU6050 &mpu){
   Serial.println(abs(a.acceleration.x));
   Serial.print("X threshold: ");
   Serial.println(MPU_ACCEL_X_THRESH);
+  Serial.print("Y accel: ");
+  Serial.println(abs(a.acceleration.y));
+  Serial.print("Y threshold: ");
+  Serial.println(MPU_ACCEL_Y_THRESH);
   Serial.print("Z accel: ");
   Serial.println(abs(a.acceleration.z));
   Serial.print("Z threshold: ");
   Serial.println(MPU_ACCEL_Z_THRESH);
-  if(abs(a.acceleration.x) >= MPU_ACCEL_X_THRESH || abs(a.acceleration.z) >= MPU_ACCEL_Z_THRESH){
+  if(abs(a.acceleration.z) >= MPU_ACCEL_Z_THRESH){
     Serial.println("Motion detected");
     digitalWrite(led_1, HIGH);
     return true;
