@@ -241,17 +241,35 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
 
 // Super basic detection algorithm, should probably upgrade now.
 // Using the accelerometer to get the data
-bool motion_detected(Adafruit_MPU6050 &mpu){
+// Global variables to store previous acceleration values
+float prev_accel_x = 0.0;
+float prev_accel_y = 0.0;
+float prev_accel_z = 0.0;
+
+// Threshold for change in acceleration
+const float ACCEL_CHANGE_THRESH = 0.05; // Adjust this value as needed
+
+bool motion_detected(Adafruit_MPU6050 &mpu) {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
-  //Checking if the sensor reads 000, 000, 000 and resetting it
-  if(a.acceleration.x == 0.00 && a.acceleration.y == 0.00 && a.acceleration.z == 0.00){
+  // Checking if the sensor reads 000, 000, 000 and resetting it
+  if (a.acceleration.x == 0.00 && a.acceleration.y == 0.00 && a.acceleration.z == 0.00) {
     reset_mpu(mpu);
     mpu.getEvent(&a, &g, &temp);
   }
 
-  //Checking if the sensor is in use
+  // Calculate the change in acceleration
+  float delta_x = abs(a.acceleration.x - prev_accel_x);
+  float delta_y = abs(a.acceleration.y - prev_accel_y);
+  float delta_z = abs(a.acceleration.z - prev_accel_z);
+
+  // Update previous acceleration values
+  prev_accel_x = a.acceleration.x;
+  prev_accel_y = a.acceleration.y;
+  prev_accel_z = a.acceleration.z;
+
+  // Checking if the sensor is in use
   Serial.print("X accel: ");
   Serial.println(abs(a.acceleration.x));
   Serial.print("X threshold: ");
@@ -264,7 +282,16 @@ bool motion_detected(Adafruit_MPU6050 &mpu){
   Serial.println(abs(a.acceleration.z));
   Serial.print("Z threshold: ");
   Serial.println(MPU_ACCEL_Z_THRESH);
-  if(abs(a.acceleration.z) >= MPU_ACCEL_Z_THRESH){
+  Serial.print("Delta X: ");
+  Serial.println(delta_x);
+  Serial.print("Delta Y: ");
+  Serial.println(delta_y);
+  Serial.print("Delta Z: ");
+  Serial.println(delta_z);
+  Serial.print("Change threshold: ");
+  Serial.println(ACCEL_CHANGE_THRESH);
+
+  if (abs(a.acceleration.z) >= MPU_ACCEL_Z_THRESH || delta_x >= ACCEL_CHANGE_THRESH || delta_y >= ACCEL_CHANGE_THRESH || delta_z >= ACCEL_CHANGE_THRESH) {
     Serial.println("Motion detected");
     digitalWrite(led_1, HIGH);
     return true;

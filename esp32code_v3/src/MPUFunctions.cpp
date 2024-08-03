@@ -9,7 +9,7 @@ void mpu_init(Adafruit_MPU6050 &mpu, mpu6050_accel_range_t accel_range, mpu6050_
   // Try to initialize!
   if (!mpu.begin()) {
     Serial.println("Failed to find MPU6050 chip");
-    while (1) {
+    while (!mpu.begin()) {
       delay(10);
     }
   }
@@ -88,9 +88,9 @@ String get_mpu_data(Adafruit_MPU6050 &mpu) {
 // Resets the MPU6050 and reconfigures it with the previous settings
 void reset_mpu(Adafruit_MPU6050 &mpu) {
   // Get current settings
-  mpu6050_accel_range_t accel_range = mpu.getAccelerometerRange();
-  mpu6050_gyro_range_t gyro_range = mpu.getGyroRange();
-  mpu6050_bandwidth_t bandwidth = mpu.getFilterBandwidth();
+  const mpu6050_accel_range_t accel_range = mpu.getAccelerometerRange();
+  const mpu6050_gyro_range_t gyro_range = mpu.getGyroRange();
+  const mpu6050_bandwidth_t bandwidth = mpu.getFilterBandwidth();
 
   // Reset the MPU6050
   mpu.reset();
@@ -108,15 +108,6 @@ void reset_mpu(Adafruit_MPU6050 &mpu) {
 int number_seen;
 bool sensor_active;
 bool above_thresh;
-
-//These are just random values. We can change them later (z accel is higher since its experiencing 9.8 g
-// at least in the mounting position of usb port down like we did during the semester)
-const float MPU_ACCEL_X_THRESH = 0.7;
-const float MPU_ACCEL_Y_THRESH = 11;
-const float MPU_ACCEL_Z_THRESH = 0.20;
-const float MPU_GYRO_X_THRESH = 2;
-const float MPU_GYRO_Y_THRESH = 2;
-const float MPU_GYRO_Z_THRESH = 2;
 
 //Again number is randomly selected should refine through testing
 const uint8_t debounce_thresh = 30;
@@ -198,18 +189,45 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
 
 // Super basic detection algorithm, should probably upgrade now.
 // Using the accelerometer to get the data
-bool motion_detected(Adafruit_MPU6050 &mpu){
+
+//These are just random values. We can change them later (z accel is higher since its experiencing 9.8 g
+// at least in the mounting position of usb port down like we did during the semester)
+const float MPU_ACCEL_X_THRESH = 0.7;
+const float MPU_ACCEL_Y_THRESH = 11;
+const float MPU_ACCEL_Z_THRESH = 0.20;
+const float MPU_GYRO_X_THRESH = 2;
+const float MPU_GYRO_Y_THRESH = 2;
+const float MPU_GYRO_Z_THRESH = 2;
+
+// Global variables to store previous acceleration values
+float prev_accel_x = 0.0;
+float prev_accel_y = 0.0;
+float prev_accel_z = 0.0;
+
+// Threshold for change in acceleration
+const float ACCEL_CHANGE_THRESH = 0.05; // Adjust this value as needed
+
+bool motion_detected(Adafruit_MPU6050 &mpu) {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
-  //Checking if the sensor reads 000, 000, 000 and resetting it
-  if(a.acceleration.x == 0.00 && a.acceleration.y == 0.00 && a.acceleration.z == 0.00){
+  // Checking if the sensor reads 000, 000, 000 and resetting it
+  if (a.acceleration.x == 0.00 && a.acceleration.y == 0.00 && a.acceleration.z == 0.00) {
     reset_mpu(mpu);
     mpu.getEvent(&a, &g, &temp);
   }
 
-  //Checking if the sensor is in use
-  if(abs(a.acceleration.x) >= MPU_ACCEL_X_THRESH || abs(a.acceleration.z) >= MPU_ACCEL_Z_THRESH){
+  // Calculate the change in acceleration
+  float delta_x = abs(a.acceleration.x - prev_accel_x);
+  float delta_y = abs(a.acceleration.y - prev_accel_y);
+  float delta_z = abs(a.acceleration.z - prev_accel_z);
+
+  // Update previous acceleration values
+  prev_accel_x = a.acceleration.x;
+  prev_accel_y = a.acceleration.y;
+  prev_accel_z = a.acceleration.z;
+
+  if (abs(a.acceleration.z) >= MPU_ACCEL_Z_THRESH || delta_x >= ACCEL_CHANGE_THRESH || delta_y >= ACCEL_CHANGE_THRESH || delta_z >= ACCEL_CHANGE_THRESH) {
     return true;
   } else {
     return false;
