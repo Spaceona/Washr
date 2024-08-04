@@ -8,10 +8,10 @@ i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
 imu = MPU6050(i2c)
 t0 = time.time()
 # Wait for MPU to Settle
-#settling_time = 4
-#print('Settling MPU for %d seconds' % settling_time)
-#time.sleep(4)
-#print('MPU is Done Settling')
+settling_time = 4
+print('Settling MPU for %d seconds' % settling_time)
+time.sleep(4)
+print('MPU is Done Settling')
 
 
 
@@ -63,5 +63,5 @@ def gyro_calibration(calibration_time=10):
     print('Calibration for Gyro is Complete! %d points total' % num_of_points)
     offsets = [i/num_of_points for i in offsets] # we divide by the length to get the mean
     return offsets
-#offsets_out = gyro_calibration(10)
-#print(offsets_out)
+offsets_out = gyro_calibration(10)
+print(offsets_out)
