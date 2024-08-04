@@ -13,7 +13,14 @@ t0 = time.time()
 #time.sleep(4)
 #print('MPU is Done Settling')
 
-
+# Function to get accelerometer and gyroscope data
+def get_imu_data_calibrated(x_offset, y_offset, z_offset):
+    ax, ay, az = imu.accel.x, imu.accel.y, imu.accel.z
+    gx, gy, gz = imu.gyro.x - x_offset, imu.gyro.y - y_offset, imu.gyro.z - z_offset
+    return {
+        'accelerometer': {'x': ax, 'y': ay, 'z': az},
+        'gyroscope': {'x': gx, 'y': gy, 'z': gz}
+    }
 
 def get_gyro():
     gx=imu.gyro.x
@@ -63,5 +70,6 @@ def gyro_calibration(calibration_time=10):
     print('Calibration for Gyro is Complete! %d points total' % num_of_points)
     offsets = [i/num_of_points for i in offsets] # we divide by the length to get the mean
     return offsets
+    
 #offsets_out = gyro_calibration(10)
 #print(offsets_out)

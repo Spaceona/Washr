@@ -9,4 +9,3 @@ All the code for the Pico W is in the PicoArchive folder, and is mainly for refe
 In order to contribute, please create a new branch and make a pull request when ready to merge. The code will be reviewed before it is merged.
 
 Please read all the `ABOUT.md` files in the respective folders for more information on how to set up the code and how to use it. 
-```
