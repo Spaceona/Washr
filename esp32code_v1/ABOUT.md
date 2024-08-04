@@ -1,2 +1,0 @@
-This is the first version of the SpaceOna code for an ESP32, more specifically the Seeed Studio ESP32C3. 
-It includes just the basic features of connecting to wifi, reading from the MPU, and transmitting it to the server.
