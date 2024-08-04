@@ -3,13 +3,14 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include "MPUFunctions.h"
+#include "globals.h"
 
 void mpu_init(Adafruit_MPU6050 &mpu, mpu6050_accel_range_t accel_range, mpu6050_gyro_range_t gyro_range, mpu6050_bandwidth_t bandwidth){
   
   // Try to initialize!
   if (!mpu.begin()) {
     Serial.println("Failed to find MPU6050 chip");
-    while (1) {
+    while (!mpu.begin()) {
       delay(10);
     }
   }
@@ -88,9 +89,9 @@ String get_mpu_data(Adafruit_MPU6050 &mpu) {
 // Resets the MPU6050 and reconfigures it with the previous settings
 void reset_mpu(Adafruit_MPU6050 &mpu) {
   // Get current settings
-  mpu6050_accel_range_t accel_range = mpu.getAccelerometerRange();
-  mpu6050_gyro_range_t gyro_range = mpu.getGyroRange();
-  mpu6050_bandwidth_t bandwidth = mpu.getFilterBandwidth();
+  const mpu6050_accel_range_t accel_range = mpu.getAccelerometerRange();
+  const mpu6050_gyro_range_t gyro_range = mpu.getGyroRange();
+  const mpu6050_bandwidth_t bandwidth = mpu.getFilterBandwidth();
 
   // Reset the MPU6050
   mpu.reset();

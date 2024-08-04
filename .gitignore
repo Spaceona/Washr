@@ -1,7 +1,9 @@
 venv
 .idea
+.vscode
 offsets.txt
 CodeToUpload
-esp32code_v1/wifi_secrets.h
 wifi_secrets.h
 build
+.DS_Store
+.pio

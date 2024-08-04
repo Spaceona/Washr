@@ -6,8 +6,11 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include "TickFunction.h"
-#include "MPUFunctions.h"
 
+#include <globals.h>
+
+#include "MPUFunctions.h"
+#include "globals.h"
 
 
 // Setting the states for the tick function
@@ -17,7 +20,7 @@ enum States {
 } Sensor_State;
 
 // Setting up the tick function
-void tickFunction(Adafruit_MPU6050 &mpu, const char* server_name, WiFiClientSecure &client, HTTPClient &https, int &led_1) {
+void tickFunction(Adafruit_MPU6050 &mpu, const char* server_name, WiFiClientSecure &client, HTTPClient &https) {
 
   // Transitions
   switch (Sensor_State)

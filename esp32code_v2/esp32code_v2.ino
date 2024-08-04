@@ -5,7 +5,7 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include <WiFi.h>
-#include <NetworkClientSecure.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ezTime.h>
 #include "MPUFunctions.h"
@@ -19,11 +19,12 @@ const char *server_name = "https://api.spaceona.com/update/lafayette.edu/watsonh
 // Setting up the MPU
 Adafruit_MPU6050 mpu;
 
-// Setting up the LED
-int led_1 = D10;
+// Setting up the LEDs
+int led_1 = D3;
+int led_2 = D2;
 
 // Setting up the wifi client for making HTTPS requests
-NetworkClientSecure client;
+WiFiClientSecure client;
 HTTPClient https;
 
 Timezone myTimezone;
@@ -31,12 +32,16 @@ String zone_name = "America/New_York";
 
 void setup(){
 
-  // Setting up the serial
+  // Setting up the Serial
   Serial.begin(115200);
   delay(1000);
 
+  // Setting up the Serial1 for debugging
+  //Serial1.begin(115200, SERIAL_8N1, D7, D6);
+
   // Setting up the LED
   pinMode(led_1, OUTPUT);
+  pinMode(led_2, OUTPUT);
 
   //Initializing MPU
   mpu_init(mpu, MPU6050_RANGE_8_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
@@ -51,12 +56,12 @@ void setup(){
 // Setting up the timers for the tick function state machine
 int tick_timer1 = 0;
 int tick_timer2 = millis();
-int tick_period = 30000;
+int tick_period = 15000; //In milliseconds
 
 // Setting up the timers for the mpu debounce state machine
 int mpu_timer1 = 0;
 int mpu_timer2 = millis();
-int mpu_period = 100;
+int mpu_period = 100; //In milliseconds
 
 bool in_use;
 
