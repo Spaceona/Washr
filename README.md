@@ -1,49 +1,12 @@
-# Hackathon_Washr
-# Hackathon_Washr
-Ruef Laundry Room Monitoring System
-This web application monitors the status of a washing machine in the Ruef Laundry Room using data from a Raspberry Pi Pico with an attached MPU6050 gyroscope module. The application fetches real-time data from a Firebase Realtime Database and displays the status of "Washing Machine 1" in a color-coded box.
+This is the repository for the code for the Washr sensor to detect if a washing machine is on. 
+Originally the code was written in MicroPython for the Raspberry Pi Pico W, although it has since been migrated to an Seeed Studio XIAO ESP32C3 using Arduino C. 
 
-Setup
-Firebase Configuration:
+Right now it contains two main versions of the code, esp32code_v2 and esp32code_v3. V2 is designed to be run in the Arduino IDE, while V3 is designed to be run in PlatformIO. The V2 code is depreciated right now and is mainly used for reference. The V3 code is the most up to date and is the one that is being actively developed.
 
-Replace the placeholder values in the script with your Firebase project configuration.
 
-javascript
-Copy code
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    databaseURL: "YOUR_DATABASE_URL",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-Firebase Realtime Database:
+All the code for the Pico W is in the PicoArchive folder, and is mainly for reference since the Pico version is no longer in active development.
 
-Set up a Firebase Realtime Database and configure the rules appropriately.
-HTML and JavaScript:
+In order to contribute, please create a new branch and make a pull request when ready to merge. The code will be reviewed before it is merged.
 
-Copy and paste the provided HTML and JavaScript code into your project.
-Dependencies:
-
-Ensure that you have the necessary Firebase JavaScript SDK versions included. (As of the provided code, it uses version 9.1.0)
-
-Usage
-Open the HTML file in a web browser.
-
-Features
-Displays the status of "Washing Machine 1" in a color-coded box.
-Real-time updates every 15 seconds.
-
-Troubleshooting
-If the box color is not updating correctly, check the console in the browser's developer tools for error messages.
-
-Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-# Washr
-# Washr
+Please read all the `ABOUT.md` files in the respective folders for more information on how to set up the code and how to use it. 
+```

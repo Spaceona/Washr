@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 .DS_Store
+.idea
 codeToUpload/
+venv
+offsets.txt
+=======
 venv
 .idea
 .vscode
@@ -9,3 +14,4 @@ wifi_secrets.h
 build
 .DS_Store
 .pio
+>>>>>>> main
