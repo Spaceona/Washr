@@ -127,7 +127,7 @@ time_t firmwareUpdateTime() {
 
     // Set the time to 7 PM tomorrow
     //tm.Hour = 19;  // 7 PM
-    tm.Minute+= 1; // 0 minutes //Testing every minute to check if it is working
+    tm.Minute += 1; // 0 minutes //Testing every minute to check if it is working
     tm.Second = 0; // 0 seconds
     //tm.Day += 1;   // Move to the next day
 
@@ -141,4 +141,3 @@ void firmwareCheck() {
     Serial.println("Event callback reached");
     myTimezone.setEvent(firmwareCheck, firmwareTime);
 }
-

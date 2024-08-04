@@ -16,7 +16,8 @@
 
 #define FIRMWARE_VERSION "0.3"
 
-const char *server_name = "https://api.spaceona.com/update/lafayette.edu/watsonhall/washer/0/false?token=NpLvwbWzkgrpq2UZem9TbfN4s6gcBTiNuaoqA3Ap9S9csrEp";
+const char* server_name =
+    "https://api.spaceona.com/update/lafayette.edu/watsonhall/washer/0/false?token=NpLvwbWzkgrpq2UZem9TbfN4s6gcBTiNuaoqA3Ap9S9csrEp";
 
 // Setting up the MPU
 Adafruit_MPU6050 mpu;
@@ -27,36 +28,32 @@ WiFiClientSecure client;
 HTTPClient https;
 
 
+void setup() {
+    // Setting up the Serial
+    Serial.begin(115200);
+    delay(1000);
 
+    // Setting up the Serial1 for debugging
+    //Serial1.begin(115200, SERIAL_8N1, D7, D6);
 
+    // Setting up the LED
+    pinMode(led_1, OUTPUT);
+    pinMode(led_2, OUTPUT);
 
-void setup(){
+    //Initializing MPU
+    mpu_init(mpu, MPU6050_RANGE_8_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
 
-  // Setting up the Serial
-  Serial.begin(115200);
-  delay(1000);
+    //Initializing the Wifi
+    wifi_init(server_name, client, https);
 
-  // Setting up the Serial1 for debugging
-  //Serial1.begin(115200, SERIAL_8N1, D7, D6);
+    //Waiting for the clock to sync
+    waitForSync();
 
-  // Setting up the LED
-  pinMode(led_1, OUTPUT);
-  pinMode(led_2, OUTPUT);
+    //Setting up the time to check for firmware updates (also sets up the clock)
+    time_t firmwareTime = firmwareUpdateTime();
 
-  //Initializing MPU
-  mpu_init(mpu, MPU6050_RANGE_8_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
-
-  //Initializing the Wifi
-  wifi_init(server_name, client, https);
-
-  //Waiting for the clock to sync
-  waitForSync();
-
-  //Setting up the time to check for firmware updates (also sets up the clock)
-  time_t firmwareTime = firmwareUpdateTime();
-
-  //Setting up the fimware check event
-  myTimezone.setEvent(firmwareCheck, firmwareTime);
+    //Setting up the fimware check event
+    myTimezone.setEvent(firmwareCheck, firmwareTime);
 }
 
 // Setting up the timers for the tick function state machine
@@ -72,29 +69,25 @@ int mpu_period = 100; //In milliseconds
 bool in_use;
 
 void loop() {
+    // Used for ezTime events
+    events();
 
-  // Used for ezTime events
-  events();
+    //Updating the tick functions timers
+    tick_timer2 = millis();
+    mpu_timer2 = millis();
 
-  //Updating the tick functions timers
-  tick_timer2 = millis();
-  mpu_timer2 = millis();
-  
-  // Updating the MPUs debouncing state machine
-  if((mpu_timer2 - mpu_timer1) >= mpu_period){
-    in_use = mpu_tick(mpu);
-    //Serial.println("Machine status: ");
-    //Serial.println(in_use);
-    mpu_timer1 = mpu_timer2;
-  }
+    // Updating the MPUs debouncing state machine
+    if ((mpu_timer2 - mpu_timer1) >= mpu_period) {
+        in_use = mpu_tick(mpu);
+        //Serial.println("Machine status: ");
+        //Serial.println(in_use);
+        mpu_timer1 = mpu_timer2;
+    }
 
-  //If the server takes a long time to respond, it won't call the mpu function so it doesn't update the status correctly. The ESP32C3 doesn't have multithreading, so need to fix that
-  if ((tick_timer2 - tick_timer1) >= tick_period){
-    //Serial.println("Tick function reached");
-    tickFunction(mpu, server_name, client, https);
-    tick_timer1 = tick_timer2;
-  }
-
+    //If the server takes a long time to respond, it won't call the mpu function so it doesn't update the status correctly. The ESP32C3 doesn't have multithreading, so need to fix that
+    if ((tick_timer2 - tick_timer1) >= tick_period) {
+        //Serial.println("Tick function reached");
+        tickFunction(mpu, server_name, client, https);
+        tick_timer1 = tick_timer2;
+    }
 }
-
-
