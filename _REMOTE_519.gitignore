@@ -1,9 +1,0 @@
-venv
-.idea
-.vscode
-offsets.txt
-CodeToUpload
-wifi_secrets.h
-build
-.DS_Store
-.pio
