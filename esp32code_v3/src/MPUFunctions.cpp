@@ -3,6 +3,7 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include "MPUFunctions.h"
+#include "globals.h"
 
 void mpu_init(Adafruit_MPU6050 &mpu, mpu6050_accel_range_t accel_range, mpu6050_gyro_range_t gyro_range, mpu6050_bandwidth_t bandwidth){
   

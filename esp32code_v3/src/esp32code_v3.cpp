@@ -9,27 +9,26 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ezTime.h>
+#include "globals.h"
 #include "MPUFunctions.h"
 #include "TickFunction.h"
 #include "WifiFunctions.h"
 
-#define FIRMWARE_VERSION "0.2"
+#define FIRMWARE_VERSION "0.3"
 
 const char *server_name = "https://api.spaceona.com/update/lafayette.edu/watsonhall/washer/0/false?token=NpLvwbWzkgrpq2UZem9TbfN4s6gcBTiNuaoqA3Ap9S9csrEp";
 
 // Setting up the MPU
 Adafruit_MPU6050 mpu;
 
-// Setting up the LEDs
-int led_1 = D3;
-int led_2 = D2;
 
 // Setting up the wifi client for making HTTPS requests
 WiFiClientSecure client;
 HTTPClient https;
 
-Timezone myTimezone;
-String zone_name = "America/New_York";
+
+
+
 
 void setup(){
 
@@ -50,8 +49,14 @@ void setup(){
   //Initializing the Wifi
   wifi_init(server_name, client, https);
 
-  //Setting up the clock
-  setClock(myTimezone, zone_name);
+  //Waiting for the clock to sync
+  waitForSync();
+
+  //Setting up the time to check for firmware updates (also sets up the clock)
+  time_t firmwareTime = firmwareUpdateTime();
+
+  //Setting up the fimware check event
+  myTimezone.setEvent(firmwareCheck, firmwareTime);
 }
 
 // Setting up the timers for the tick function state machine
@@ -86,7 +91,7 @@ void loop() {
   //If the server takes a long time to respond, it won't call the mpu function so it doesn't update the status correctly. The ESP32C3 doesn't have multithreading, so need to fix that
   if ((tick_timer2 - tick_timer1) >= tick_period){
     //Serial.println("Tick function reached");
-    tickFunction(mpu, server_name, client, https, led_1);
+    tickFunction(mpu, server_name, client, https);
     tick_timer1 = tick_timer2;
   }
 
