@@ -116,27 +116,27 @@ void loop() {
     mpu.getEvent(&a, &g, &temp);
 
     /* Print out the values */
-    Serial.print("Acceleration X: ");
-    Serial.print(a.acceleration.x);
-    Serial.print(", Y: ");
-    Serial.print(a.acceleration.y);
-    Serial.print(", Z: ");
-    Serial.print(a.acceleration.z);
-    Serial.println(" m/s^2");
+    // Serial.print("Acceleration X: ");
+    // Serial.print(a.acceleration.x);
+    // Serial.print(", Y: ");
+    // Serial.print(a.acceleration.y);
+    // Serial.print(", Z: ");
+    // Serial.print(a.acceleration.z);
+    // Serial.println(" m/s^2");
 
-    Serial.print("Rotation X: ");
-    Serial.print(g.gyro.x);
-    Serial.print(", Y: ");
-    Serial.print(g.gyro.y);
-    Serial.print(", Z: ");
-    Serial.print(g.gyro.z);
-    Serial.println(" rad/s");
+    // Serial.print("Rotation X: ");
+    // Serial.print(g.gyro.x);
+    // Serial.print(", Y: ");
+    // Serial.print(g.gyro.y);
+    // Serial.print(", Z: ");
+    // Serial.print(g.gyro.z);
+    // Serial.println(" rad/s");
 
-    Serial.print("Temperature: ");
-    Serial.print(temp.temperature);
-    Serial.println(" degC");
+    // Serial.print("Temperature: ");
+    // Serial.print(temp.temperature);
+    // Serial.println(" degC");
 
-    Serial.println("");
+    // Serial.println("");
 
     in_use = mpu_tick(mpu);
     Serial.println("Machine status: ");
@@ -167,6 +167,7 @@ const float MPU_GYRO_Z_THRESH = 2;
 
 //Again number is randomly selected should refine through testing
 const uint8_t debounce_thresh = 30;
+const uint8_t debounce_above_thresh = 70; //how much higher the debouncer can go when detecting
 
 bool mpu_tick(Adafruit_MPU6050 &mpu){
 
@@ -207,7 +208,7 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
     // State logic goes here
     sensor_active = false;
     if(above_thresh){
-      if(number_seen <= debounce_thresh+10){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
+      if(number_seen <= debounce_thresh+debounce_above_thresh){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
         number_seen++;
       }
     } else { //Bounding it to 0 so that having the machine idle doesn't make it impossible to detect as active
@@ -221,7 +222,7 @@ bool mpu_tick(Adafruit_MPU6050 &mpu){
     sensor_active = true;
     if(above_thresh){
       digitalWrite(led_1, HIGH);
-      if(number_seen <= debounce_thresh+10){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
+      if(number_seen <= debounce_thresh+debounce_above_thresh){ //Bounding it to the threshold so that it wont keep adding to the debounce counter while active
         number_seen++;
       }
     } else {
@@ -247,7 +248,7 @@ float prev_accel_y = 0.0;
 float prev_accel_z = 0.0;
 
 // Threshold for change in acceleration
-const float ACCEL_CHANGE_THRESH = 0.05; // Adjust this value as needed
+const float ACCEL_CHANGE_THRESH = 0.03; // Adjust this value as needed
 
 bool motion_detected(Adafruit_MPU6050 &mpu) {
   sensors_event_t a, g, temp;
