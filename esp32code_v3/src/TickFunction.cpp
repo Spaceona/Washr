@@ -6,9 +6,7 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include "TickFunction.h"
-
-#include <globals.h>
-
+#include "WifiFunctions.h"
 #include "MPUFunctions.h"
 #include "globals.h"
 
@@ -22,7 +20,7 @@ enum States {
 } Sensor_State;
 
 // Setting up the tick function
-void tickFunction(Adafruit_MPU6050 &mpu, const char *server_name, HTTPClient &https) {
+void tickFunction(Adafruit_MPU6050 &mpu, HTTPClient &https) {
 
     // Transitions
     switch (Sensor_State) {
@@ -30,7 +28,11 @@ void tickFunction(Adafruit_MPU6050 &mpu, const char *server_name, HTTPClient &ht
             Sensor_State = Transmit;
             break;
         case Transmit:
-            Sensor_State = Transmit;
+            if(authenticated){
+                Sensor_State = Transmit;
+            } else {
+                Sensor_State = Authenticate;
+            }
             break;
         case Authenticate:
             if (authenticated) {
@@ -59,18 +61,10 @@ void tickFunction(Adafruit_MPU6050 &mpu, const char *server_name, HTTPClient &ht
             //Serial.println("Entered Transmit stage!");
             // Checking to make sure the wifi is configured
             if (WiFi.status() != WL_CONNECTED) {
-                while (WiFi.status() != WL_CONNECTED) {
-                    Serial.println("\nWifi is offline, trying to reconnect...");
-                    WiFi.reconnect();
-                    delay(500);
-                }
-                Serial.println("\nWifi has reconnected");
-                Serial.print("Local ESP32 IP: ");
-                Serial.println(WiFi.localIP());
+                wifiConnect();
             } else {
 
-                Serial.print("Local ESP32 IP: ");
-                Serial.println(WiFi.localIP());
+
 
                 // Transmitting the data
                 Serial.println("Starting HTTPS connection...");
@@ -96,6 +90,13 @@ void tickFunction(Adafruit_MPU6050 &mpu, const char *server_name, HTTPClient &ht
                 digitalWrite(led_1, LOW);
 
             }
+            break;
+        case Authenticate:
+            digitalWrite(led_1, LOW);
+            if(WiFi.status() != WL_CONNECTED){
+                wifiConnect();
+            }
+            authenticated = serverAuth();
             break;
         default:
             break;

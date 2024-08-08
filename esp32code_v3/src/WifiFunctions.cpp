@@ -48,6 +48,7 @@ void wifi_init(String server_name, HTTPClient& https) {
         Serial.print(".");
         delay(100);
     }
+    Serial.println("");
 
     Serial.println("\nConnected to the WiFi network");
     Serial.print("Local ESP32 IP: ");
@@ -75,6 +76,17 @@ void wifi_init(String server_name, HTTPClient& https) {
     else {
         Serial.println("Connection successful");
     }
+}
+
+void wifiConnect(){
+    while (WiFi.status() != WL_CONNECTED) {
+        Serial.println("\nWifi is offline, trying to reconnect...");
+        WiFi.reconnect();
+        delay(500);
+    }
+    Serial.println("\nWifi has reconnected");
+    Serial.print("Local ESP32 IP: ");
+    Serial.println(WiFi.localIP());
 }
 
 //Setting up the HTTPS information
@@ -127,9 +139,14 @@ boolean serverAuth(){
             jwt = String(auth_data["jwt"].as<const char*>()); //converting to a string
             Serial.println("JWT: " + jwt);
             Serial.println("");
+            authenticated = true;
+            digitalWrite(led_1, HIGH);
+            delay(50);
+            digitalWrite(led_1, LOW);
             return true;
         } else if (httpCode == 400){
             Serial.println("Unauthorized");
+            authenticated = false;
             return false;
         }
     }
@@ -141,12 +158,65 @@ boolean serverAuth(){
     return true;
 }
 
+HTTPClient statusClient;
+
 void machineStatusUpdate(boolean machineStatus){
-    endpoint = "/auth/device";
+    //Setting up the endpoint
+    endpoint = "/update/" + clientName + "/" + building + "/" + type + "/" + id;
+    String statusServer = server_name + endpoint;
+    Serial.println("Status server: " + statusServer);
+
+    //Testing server connection
     Serial.println("Starting HTTPS connection...");
-    if (!authClient.begin(testClient, auth_server)) {
+    if (!statusClient.begin(testClient, statusServer)) {
         Serial.println("Failed to start HTTPS connection");
         return;
+    }
+    Serial.println("Connected to the server");
+
+    //Setting up the data to be sent
+    JsonDocument statusData;
+    statusData["firmwareVersion"] = FIRMWARE_VERSION;
+    statusData["status"] = machineStatus;
+    statusData["confidence"] = detectionConfidence;
+    String statusDataString;
+    serializeJson(statusData, statusDataString);
+    Serial.println("Data to be sent: " + statusDataString);
+    Serial.println("JWT: " + jwt);
+    //Adding headers
+    String authHeader = "Bearer " + jwt;
+    statusClient.addHeader("Authorization", authHeader);
+    statusClient.addHeader("Content-Type", "application/json");
+
+    //Posting
+    int httpCode = statusClient.POST(statusDataString);
+
+    Serial.print("HTTP Code: ");
+    Serial.println(httpCode);
+    if(httpCode > 0){
+        String responseBody = authClient.getString();
+        Serial.println("Response body: " + responseBody);
+        if(httpCode == 200){
+            Serial.println("Status updated successfully");
+            digitalWrite(led_1, HIGH);
+            delay(100);
+            digitalWrite(led_1, LOW);
+            return;
+        }
+        else if (httpCode == 401){
+            Serial.println("Unauthorized");
+            authenticated = false;
+        } else if(httpCode == 400){
+            Serial.println("Bad request");
+            //TODO check client and building assignment if bad request
+        } else if(httpCode == 500){
+            Serial.println("Internal server error");
+        } else {
+            Serial.println("Failed to update machine status: Unknown error");
+        }
+    }
+    else{
+        Serial.println("Error on HTTP request");
     }
 }
 
@@ -174,7 +244,7 @@ void ota_update(WiFiClient ota_client, String ota_server_url, uint16_t ota_port,
     }
 }
 
-// Set time via NTP, will be used for OTA sync at an offtime. Look into ezTime "setEvent()"
+// Set time via NTP, will be used for OTA sync at an off time. Look into ezTime "setEvent()"
 void setClock() {
     waitForSync();
 

@@ -13,7 +13,10 @@
 #include <ezTime.h>
 #include "wifi_secrets.h"
 
-#define FIRMWARE_VERSION "1-0-0";
+extern String FIRMWARE_VERSION;
+extern int FIRMWARE_VERSION_MAJOR;
+extern int FIRMWARE_VERSION_MINOR;
+extern int FIRMWARE_VERSION_PATCH ;
 
 extern Timezone myTimezone;
 extern String timezone_name;
@@ -25,6 +28,11 @@ extern String clientKey;
 extern String server_name;
 extern String endpoint;
 
+extern String clientName;
+extern String building;
+extern String type;
+extern String id;
+
 extern String jwt;
 extern boolean authenticated;
 
@@ -34,5 +42,7 @@ extern int led_2;
 extern const char* ssid;
 extern const char* password;
 extern String mac_address;
+
+extern int detectionConfidence;
 
 #endif //GLOBALS_H

@@ -18,6 +18,16 @@ It also updated the code to use the PlatformIO IDE instead of the Arduino IDE.
 8. Make changes to the code and test them on the ESP32C3 board.
 9. If you are going to add new libraries to the project, add them to the `platformio.ini` file.
 
+### Code Style
+TODO
+
+### Pull Request Guidelines
+TODO
+
+### Firmware Update
+Please make sure to change the firmware version in the globals.cpp file before commiting to the repository.
+Once the code has been merged please make sure to build the firmware, rename it to the correct version, and commit it to the spaceona-db repository in the correct folder.
+
 ### WiFi Configuration
 In order to connect the board to WiFi, please follow the steps below:
 

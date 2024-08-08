@@ -11,6 +11,6 @@
 #include "globals.h"
 
 //Tick function for the central logic. Right now just constantly transmits the raw sensor data
-void tickFunction(Adafruit_MPU6050 &mpu, const char* server_name, HTTPClient &https);
+void tickFunction(Adafruit_MPU6050 &mpu, HTTPClient &https);
 
 #endif
