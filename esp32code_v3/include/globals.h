@@ -43,6 +43,7 @@ extern const char* ssid;
 extern const char* password;
 extern String mac_address;
 
+extern boolean machineStatus;
 extern int detectionConfidence;
 
 #endif //GLOBALS_H

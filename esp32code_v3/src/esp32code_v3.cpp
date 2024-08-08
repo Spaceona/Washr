@@ -51,7 +51,7 @@ void setup() {
     //Setting up the firmware check event
     myTimezone.setEvent(firmwareCheck, firmwareTime);
 
-    serverAuth();
+    //serverAuth();
 }
 
 // Setting up the timers for the tick function state machine
@@ -64,8 +64,6 @@ unsigned long mpu_timer1 = 0;
 unsigned long mpu_timer2 = millis();
 int mpu_period = 100; //In milliseconds
 
-bool in_use;
-
 void loop() {
     // Used for ezTime events
     //events();
@@ -76,7 +74,7 @@ void loop() {
 
     // Updating the MPUs debouncing state machine
     if ((mpu_timer2 - mpu_timer1) >= mpu_period) {
-        in_use = mpu_tick(mpu);
+        machineStatus = mpu_tick(mpu);
         //Serial.println("Machine status: ");
         //Serial.println(in_use);
         mpu_timer1 = mpu_timer2;
@@ -85,8 +83,7 @@ void loop() {
     //If the server takes a long time to respond, it won't call the mpu function so it doesn't update the status correctly. The ESP32C3 doesn't have multithreading, so need to fix that
     if ((tick_timer2 - tick_timer1) >= tick_period) {
         //Serial.println("Tick function reached");
-        //tickFunction(mpu, https);
-        machineStatusUpdate(in_use);
+        tickFunction();
         tick_timer1 = tick_timer2;
     }
 }

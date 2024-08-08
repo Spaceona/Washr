@@ -100,8 +100,8 @@ boolean serverAuth(){
 
     endpoint = "/auth/device";
     auth_server = server_name + endpoint;
-    Serial.println("Auth server: " + auth_server);
-    Serial.println("Starting HTTPS connection...");
+    //Serial.println("Auth server: " + auth_server);
+    //Serial.println("Starting HTTPS connection...");
     if (!authClient.begin(testClient, auth_server)) {
         Serial.println("Failed to start HTTPS connection");
         return false;
@@ -125,51 +125,56 @@ boolean serverAuth(){
 
     if(httpCode > 0){
         String responseBody = authClient.getString();
-        Serial.println("Response body: " + responseBody);
+        //Serial.println("Response body: " + responseBody);
         if(httpCode == 200){
             DeserializationError error = deserializeJson(auth_data, responseBody);
 
             if (error) {
                 Serial.print("deserializeJson() failed: ");
                 Serial.println(error.c_str());
+                authClient.end();
                 return false;
             }
 
             const char* message = auth_data["message"]; // "Authenticated"
             jwt = String(auth_data["jwt"].as<const char*>()); //converting to a string
-            Serial.println("JWT: " + jwt);
-            Serial.println("");
+            //Serial.println("JWT: " + jwt);
+            //Serial.println("");
             authenticated = true;
             digitalWrite(led_1, HIGH);
             delay(50);
             digitalWrite(led_1, LOW);
+            authClient.end();
             return true;
         } else if (httpCode == 400){
             Serial.println("Unauthorized");
+            authClient.end();
             authenticated = false;
             return false;
         }
     }
     else{
         Serial.println("Error on HTTP request");
+        authClient.end();
         return false;
     }
-
-    return true;
+    authClient.end();
+    return false;
 }
 
 HTTPClient statusClient;
 
-void machineStatusUpdate(boolean machineStatus){
+void machineStatusUpdate(boolean currentMachineStatus){
     //Setting up the endpoint
     endpoint = "/update/" + clientName + "/" + building + "/" + type + "/" + id;
     String statusServer = server_name + endpoint;
-    Serial.println("Status server: " + statusServer);
+    //Serial.println("Status server: " + statusServer);
 
     //Testing server connection
     Serial.println("Starting HTTPS connection...");
     if (!statusClient.begin(testClient, statusServer)) {
         Serial.println("Failed to start HTTPS connection");
+        statusClient.end();
         return;
     }
     Serial.println("Connected to the server");
@@ -177,12 +182,12 @@ void machineStatusUpdate(boolean machineStatus){
     //Setting up the data to be sent
     JsonDocument statusData;
     statusData["firmwareVersion"] = FIRMWARE_VERSION;
-    statusData["status"] = machineStatus;
+    statusData["status"] = currentMachineStatus;
     statusData["confidence"] = detectionConfidence;
     String statusDataString;
     serializeJson(statusData, statusDataString);
-    Serial.println("Data to be sent: " + statusDataString);
-    Serial.println("JWT: " + jwt);
+    //Serial.println("Data to be sent: " + statusDataString);
+    //Serial.println("JWT: " + jwt);
     //Adding headers
     String authHeader = "Bearer " + jwt;
     statusClient.addHeader("Authorization", authHeader);
@@ -191,17 +196,17 @@ void machineStatusUpdate(boolean machineStatus){
     //Posting
     int httpCode = statusClient.POST(statusDataString);
 
-    Serial.print("HTTP Code: ");
+    Serial.print("Status HTTP Code: ");
     Serial.println(httpCode);
+    String responseBody = statusClient.getString();
+    //Serial.println("Response body: " + responseBody);
+    statusClient.end();
     if(httpCode > 0){
-        String responseBody = authClient.getString();
-        Serial.println("Response body: " + responseBody);
         if(httpCode == 200){
             Serial.println("Status updated successfully");
             digitalWrite(led_1, HIGH);
             delay(100);
             digitalWrite(led_1, LOW);
-            return;
         }
         else if (httpCode == 401){
             Serial.println("Unauthorized");

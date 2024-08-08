@@ -11,9 +11,9 @@
 #include "globals.h"
 
 //Firmware version
-String FIRMWARE_VERSION = "1-0-0";
+String FIRMWARE_VERSION = "1-1-0";
 int FIRMWARE_VERSION_MAJOR = 1;
-int FIRMWARE_VERSION_MINOR = 0;
+int FIRMWARE_VERSION_MINOR = 1;
 int FIRMWARE_VERSION_PATCH = 0;
 
 //Setting up the timezone for ezTime
@@ -50,5 +50,6 @@ String mac_address;
 int led_1 = D3;
 int led_2 = D2;
 
+boolean machineStatus = false;
 //Confidence value for the machine detection
 int detectionConfidence = 0;

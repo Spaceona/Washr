@@ -20,25 +20,35 @@ enum States {
 } Sensor_State;
 
 // Setting up the tick function
-void tickFunction(Adafruit_MPU6050 &mpu, HTTPClient &https) {
-
+void tickFunction() {
+    Serial.println("Auth: " + String(authenticated));
     // Transitions
     switch (Sensor_State) {
         case Start:
-            Sensor_State = Transmit;
+            if(!authenticated){
+                Sensor_State = Authenticate;
+                Serial.println("Next state: Authenticate");
+            } else {
+                Sensor_State = Transmit;
+                Serial.println("Next state: Transmit");
+            }
             break;
         case Transmit:
-            if(authenticated){
-                Sensor_State = Transmit;
-            } else {
+            if(!authenticated){
                 Sensor_State = Authenticate;
+                Serial.println("Next state: Authenticate");
+            } else {
+                Sensor_State = Transmit;
+                Serial.println("Next state: Transmit");
             }
             break;
         case Authenticate:
-            if (authenticated) {
-                Sensor_State = Transmit;
-            } else {
+            if (!authenticated) {
                 Sensor_State = Authenticate;
+                Serial.println("Next state: Authenticate");
+            } else {
+                Sensor_State = Transmit;
+                Serial.println("Next state: Transmit");
             }
             break;
         case Wait: //TODO Will be used for waiting for authentication
@@ -55,43 +65,20 @@ void tickFunction(Adafruit_MPU6050 &mpu, HTTPClient &https) {
             // State logic would go here if there was any
             break;
         case Transmit:
-
+            Serial.println("Transmitting");
             digitalWrite(led_1, LOW);
-
-            //Serial.println("Entered Transmit stage!");
             // Checking to make sure the wifi is configured
             if (WiFi.status() != WL_CONNECTED) {
                 wifiConnect();
+            } else if(!authenticated) {
+                break;
             } else {
-
-
-
                 // Transmitting the data
-                Serial.println("Starting HTTPS connection...");
-                if (!https.begin(client, server_name)) {
-                    Serial.println("Failed to start HTTPS connection");
-                    return;
-                }
-                https.addHeader("Content-Type", "application/json");
-                String httpsPostData = get_mpu_data(mpu);
-                Serial.println("Sending POST request...");
-                int httpsResponseCode = https.POST(httpsPostData);
-                Serial.print("HTTPS Response code: ");
-                Serial.println(httpsResponseCode);
-                //Should probably add better error code handling here
-                if (httpsResponseCode <= 0) {
-                    Serial.println("Failed to send POST request");
-                    return;
-                } else {
-                    digitalWrite(led_1, HIGH);
-                    delay(100);
-                }
-                Serial.println("");
-                digitalWrite(led_1, LOW);
-
+                machineStatusUpdate(machineStatus);
             }
             break;
         case Authenticate:
+            Serial.println("Authenticating");
             digitalWrite(led_1, LOW);
             if(WiFi.status() != WL_CONNECTED){
                 wifiConnect();
