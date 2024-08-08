@@ -9,22 +9,18 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ezTime.h>
+#include <ArduinoJson.h>
 #include "globals.h"
 #include "MPUFunctions.h"
 #include "TickFunction.h"
 #include "WifiFunctions.h"
 
-#define FIRMWARE_VERSION "0.3"
-
-const char* server_name =
-    "https://api.spaceona.com/update/lafayette.edu/watsonhall/washer/0/false?token=NpLvwbWzkgrpq2UZem9TbfN4s6gcBTiNuaoqA3Ap9S9csrEp";
 
 // Setting up the MPU
 Adafruit_MPU6050 mpu;
 
 
-// Setting up the wifi client for making HTTPS requests
-WiFiClientSecure client;
+// Setting up the https client for making HTTPS requests
 HTTPClient https;
 
 
@@ -44,7 +40,7 @@ void setup() {
     mpu_init(mpu, MPU6050_RANGE_8_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
 
     //Initializing the Wifi
-    wifi_init(server_name, client, https);
+    wifi_init(server_name, https);
 
     //Waiting for the clock to sync
     waitForSync();
@@ -52,7 +48,7 @@ void setup() {
     //Setting up the time to check for firmware updates (also sets up the clock)
     time_t firmwareTime = firmwareUpdateTime();
 
-    //Setting up the fimware check event
+    //Setting up the firmware check event
     myTimezone.setEvent(firmwareCheck, firmwareTime);
 }
 
@@ -70,7 +66,7 @@ bool in_use;
 
 void loop() {
     // Used for ezTime events
-    events();
+    //events();
 
     //Updating the tick functions timers
     tick_timer2 = millis();
@@ -87,7 +83,8 @@ void loop() {
     //If the server takes a long time to respond, it won't call the mpu function so it doesn't update the status correctly. The ESP32C3 doesn't have multithreading, so need to fix that
     if ((tick_timer2 - tick_timer1) >= tick_period) {
         //Serial.println("Tick function reached");
-        tickFunction(mpu, server_name, client, https);
+        //tickFunction(mpu, server_name, https);
+        serverAuth();
         tick_timer1 = tick_timer2;
     }
 }

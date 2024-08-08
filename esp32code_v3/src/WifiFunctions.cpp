@@ -1,20 +1,16 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include <WiFiClient.h> //Need to use for insecure local testing
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
+#include <ArduinoJson.h>
 //Might want to move to the HttpsOTAUpdate library at some point since its part of the official arduino library
 #include <ezTime.h>
 #include "globals.h"
 #include "wifi_secrets.h"
 
-// Setting up the wifi details
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
-String mac_address;
 
-//Url for the firmware location
-//const char *firmware_url =
 
 // Setting up the server certificate
 const char* test_root_ca =
@@ -42,7 +38,7 @@ const char* test_root_ca =
     "-----END CERTIFICATE-----\n";
 
 
-void wifi_init(const char* server_name, WiFiClientSecure& client, HTTPClient& https) {
+void wifi_init(String server_name, HTTPClient& https) {
     // Setting up the wifi
     WiFi.mode(WIFI_STA); // Optional
     WiFi.begin(ssid, password);
@@ -72,7 +68,7 @@ void wifi_init(const char* server_name, WiFiClientSecure& client, HTTPClient& ht
 
     //Testing if the certificate is installed correctly
     Serial.println("Testing certificate and connection to server");
-    if (!client.connect("api.spaceona.com", 443)) {
+    if (!client.connect("api.spaceona.com", 3000)) {
         Serial.println("Connection failed");
         return;
     }
@@ -81,8 +77,80 @@ void wifi_init(const char* server_name, WiFiClientSecure& client, HTTPClient& ht
     }
 }
 
-//I want to add a feature where I compare the current firmware version to the remote firmware version and only update if it is bigger, but part of that is server side
-//I might also want to have it only update at like 3 in the morning instead of doing it randomly every x hours
+//Setting up the HTTPS information
+WiFiClient testClient;
+HTTPClient authClient;
+
+boolean serverAuth(){
+    String auth_server;
+    JsonDocument device_data;
+    JsonDocument auth_data;
+
+    endpoint = "/auth/device";
+    auth_server = server_name + endpoint;
+    Serial.println("Auth server: " + auth_server);
+    Serial.println("Starting HTTPS connection...");
+    if (!authClient.begin(testClient, auth_server)) {
+        Serial.println("Failed to start HTTPS connection");
+        return false;
+    }
+
+
+    device_data["mac"] = mac_address;
+    device_data["firmwareVersion"] = FIRMWARE_VERSION;
+    device_data["clientKey"] = clientKey;
+
+    String device_data_string;
+    serializeJson(device_data, device_data_string);
+    //Serial.println(device_data_string);
+
+    Serial.println("Sending POST request...");
+    authClient.addHeader("Content-Type", "application/json");
+    int httpCode = authClient.POST(device_data_string);
+
+    Serial.print("HTTP Code: ");
+    Serial.println(httpCode);
+
+    if(httpCode > 0){
+        String responseBody = authClient.getString();
+        Serial.println("Response body: " + responseBody);
+        if(httpCode == 200){
+            DeserializationError error = deserializeJson(auth_data, responseBody);
+
+            if (error) {
+                Serial.print("deserializeJson() failed: ");
+                Serial.println(error.c_str());
+                return false;
+            }
+
+            const char* message = auth_data["message"]; // "Authenticated"
+            jwt = String(auth_data["jwt"].as<const char*>()); //converting to a string
+            Serial.println("JWT: " + jwt);
+            Serial.println("");
+            return true;
+        } else if (httpCode == 400){
+            Serial.println("Unauthorized");
+            return false;
+        }
+    }
+    else{
+        Serial.println("Error on HTTP request");
+        return false;
+    }
+
+    return true;
+}
+
+void machineStatusUpdate(boolean machineStatus){
+    endpoint = "/auth/device";
+    Serial.println("Starting HTTPS connection...");
+    if (!authClient.begin(testClient, auth_server)) {
+        Serial.println("Failed to start HTTPS connection");
+        return;
+    }
+}
+
+//TODO change this to a secure connection when it is implemented on the server
 void ota_update(WiFiClient ota_client, String ota_server_url, uint16_t ota_port, String ota_firmware_location) {
     Serial.println("Starting OTA update check");
 
@@ -90,7 +158,7 @@ void ota_update(WiFiClient ota_client, String ota_server_url, uint16_t ota_port,
 
     switch (ret) {
     case HTTP_UPDATE_FAILED:
-        Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", httpUpdate.getLastError(),
+        Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", httpUpdate.getLastError(),
                       httpUpdate.getLastErrorString().c_str());
         break;
 

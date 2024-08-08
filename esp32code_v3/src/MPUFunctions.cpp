@@ -80,6 +80,7 @@ String get_mpu_data(Adafruit_MPU6050 &mpu) {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
   char buffer[200]; // Adjust the size as needed
+  //Might want to use arduino json instead
   snprintf(buffer, sizeof(buffer), "{\"accelerometer\":{\"z\":%f,\"y\":%f,\"x\":%f},\"gyroscope\":{\"z\":%f,\"y\":%f,\"x\":%f}}", a.acceleration.z, a.acceleration.y, a.acceleration.x, g.gyro.z, g.gyro.y, g.gyro.x);
   String dataJson = String(buffer);
   Serial.println(dataJson);
