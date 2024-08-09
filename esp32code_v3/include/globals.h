@@ -27,6 +27,7 @@ extern String clientKey;
 
 extern String server_name;
 extern String endpoint;
+extern String serverPort;
 
 extern String clientName;
 extern String building;

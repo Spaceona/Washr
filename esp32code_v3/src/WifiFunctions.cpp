@@ -60,6 +60,9 @@ void wifi_init(String server_name, HTTPClient& https) {
     Serial.println("Mac Address: ");
     Serial.println(mac_address);
 
+    //Printing the firmware version
+    Serial.println("Firmware version: " + FIRMWARE_VERSION);
+
     // Installing the certificate for HTTPS
     //client.setCACert(test_root_ca);
 
@@ -68,8 +71,9 @@ void wifi_init(String server_name, HTTPClient& https) {
 
     //Serial.println(test_root_ca);
 
+    //TODO use secure client
     //Testing if the certificate is installed correctly
-    Serial.println("Testing certificate and connection to server");
+    //Serial.println("Testing certificate and connection to server");
     if (!client.connect("api.spaceona.com", 3000)) {
         Serial.println("Connection failed");
         return;
@@ -227,10 +231,14 @@ void machineStatusUpdate(boolean currentMachineStatus){
 }
 
 //TODO change this to a secure connection when it is implemented on the server
-void ota_update(WiFiClient ota_client, String ota_server_url, uint16_t ota_port, String ota_firmware_location) {
+void otaUpdate(String updateFirmware) {
     Serial.println("Starting OTA update check");
 
-    t_httpUpdate_return ret = httpUpdate.update(ota_client, ota_server_url, ota_port, ota_firmware_location);
+    String firmwareEndpoint = "/firmware/file/" + updateFirmware;
+    String firmwareServer = server_name + firmwareEndpoint;
+
+    Serial.println("Firmware server: " + firmwareServer);
+    t_httpUpdate_return ret = httpUpdate.update(testClient,  firmwareServer, requestCallback);
 
     switch (ret) {
     case HTTP_UPDATE_FAILED:
@@ -248,6 +256,11 @@ void ota_update(WiFiClient ota_client, String ota_server_url, uint16_t ota_port,
         ESP.restart();
         break;
     }
+}
+
+//This function is used to add the authentication header to the OTA update request
+void requestCallback(HTTPClient* callbackClient){
+    callbackClient->addHeader("Authorization", "Bearer " + jwt);
 }
 
 // Set time via NTP, will be used for OTA sync at an off time. Look into ezTime "setEvent()"
@@ -269,11 +282,11 @@ time_t firmwareUpdateTime() {
     tmElements_t tm;
     breakTime(now, tm);
 
-    // Set the time to 7 PM tomorrow
-    //tm.Hour = 19;  // 7 PM
-    tm.Minute += 1; // 0 minutes //Testing every minute to check if it is working
+    // Set the time to 3 AM tomorrow
+    tm.Hour = 3;  // 3 Am
+    tm.Minute = 0; // 0 minutes
     tm.Second = 0; // 0 seconds
-    //tm.Day += 1;   // Move to the next day
+    tm.Day += 1;   // Move to the next day
 
     //Return the new time
     return makeTime(tm);
@@ -297,13 +310,13 @@ void firmwareCheck() {
 
     if(latestMajorVersion > FIRMWARE_VERSION_MAJOR){
         Serial.println("Major version update available");
-        //ota_update(testClient, server_name, 3000, "/firmware");
+        otaUpdate(latest_Firmware);
     } else if(latestMinorVersion > FIRMWARE_VERSION_MINOR && latestMajorVersion >= FIRMWARE_VERSION_MAJOR){
         Serial.println("Minor version update available");
-        //ota_update(testClient, server_name, 3000, "/firmware");
+        otaUpdate(latest_Firmware);
     } else if(latestPatchVersion > FIRMWARE_VERSION_PATCH && latestMinorVersion >= FIRMWARE_VERSION_MINOR && latestMajorVersion >= FIRMWARE_VERSION_MAJOR){
         Serial.println("Patch version update available");
-        //ota_update(testClient, server_name, 3000, "/firmware");
+        otaUpdate(latest_Firmware);
     } else {
         Serial.println("No updates available");
     }
