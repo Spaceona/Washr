@@ -21,34 +21,34 @@ enum States {
 
 // Setting up the tick function
 void tickFunction() {
-    Serial.println("Auth: " + String(authenticated));
+    //Serial.println("Auth: " + String(authenticated));
     // Transitions
     switch (Sensor_State) {
         case Start:
             if(!authenticated){
                 Sensor_State = Authenticate;
-                Serial.println("Next state: Authenticate");
+                //Serial.println("Next state: Authenticate");
             } else {
                 Sensor_State = Transmit;
-                Serial.println("Next state: Transmit");
+                //Serial.println("Next state: Transmit");
             }
             break;
         case Transmit:
             if(!authenticated){
                 Sensor_State = Authenticate;
-                Serial.println("Next state: Authenticate");
+                //Serial.println("Next state: Authenticate");
             } else {
                 Sensor_State = Transmit;
-                Serial.println("Next state: Transmit");
+                //Serial.println("Next state: Transmit");
             }
             break;
         case Authenticate:
             if (!authenticated) {
                 Sensor_State = Authenticate;
-                Serial.println("Next state: Authenticate");
+                //Serial.println("Next state: Authenticate");
             } else {
                 Sensor_State = Transmit;
-                Serial.println("Next state: Transmit");
+                //Serial.println("Next state: Transmit");
             }
             break;
         case Wait: //TODO Will be used for waiting for authentication
@@ -65,7 +65,7 @@ void tickFunction() {
             // State logic would go here if there was any
             break;
         case Transmit:
-            Serial.println("Transmitting");
+            //Serial.println("Transmitting");
             digitalWrite(led_1, LOW);
             // Checking to make sure the wifi is configured
             if (WiFi.status() != WL_CONNECTED) {
@@ -78,7 +78,7 @@ void tickFunction() {
             }
             break;
         case Authenticate:
-            Serial.println("Authenticating");
+            //Serial.println("Authenticating");
             digitalWrite(led_1, LOW);
             if(WiFi.status() != WL_CONNECTED){
                 wifiConnect();

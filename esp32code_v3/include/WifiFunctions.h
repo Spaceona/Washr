@@ -30,4 +30,6 @@ void firmwareCheck();
 
 time_t firmwareUpdateTime();
 
+String latestFirmware();
+
 #endif

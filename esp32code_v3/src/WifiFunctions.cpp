@@ -9,6 +9,7 @@
 #include <ezTime.h>
 #include "globals.h"
 #include "wifi_secrets.h"
+#include "WifiFunctions.h"
 
 
 
@@ -282,5 +283,103 @@ time_t firmwareUpdateTime() {
 void firmwareCheck() {
     time_t firmwareTime = firmwareUpdateTime();
     Serial.println("Event callback reached");
+    String latest_Firmware = latestFirmware();
+
+    if(latest_Firmware == "error"){
+        Serial.println("Error checking for latest firmware");
+        myTimezone.setEvent(firmwareCheck, firmwareTime);
+        return;
+    }
+
+    int latestMajorVersion = latest_Firmware.substring(0, 1).toInt();
+    int latestMinorVersion = latest_Firmware.substring(2, 3).toInt();
+    int latestPatchVersion = latest_Firmware.substring(4, 5).toInt();
+
+    if(latestMajorVersion > FIRMWARE_VERSION_MAJOR){
+        Serial.println("Major version update available");
+        //ota_update(testClient, server_name, 3000, "/firmware");
+    } else if(latestMinorVersion > FIRMWARE_VERSION_MINOR && latestMajorVersion >= FIRMWARE_VERSION_MAJOR){
+        Serial.println("Minor version update available");
+        //ota_update(testClient, server_name, 3000, "/firmware");
+    } else if(latestPatchVersion > FIRMWARE_VERSION_PATCH && latestMinorVersion >= FIRMWARE_VERSION_MINOR && latestMajorVersion >= FIRMWARE_VERSION_MAJOR){
+        Serial.println("Patch version update available");
+        //ota_update(testClient, server_name, 3000, "/firmware");
+    } else {
+        Serial.println("No updates available");
+    }
+
     myTimezone.setEvent(firmwareCheck, firmwareTime);
+}
+
+
+
+HTTPClient firmwareClient;
+
+String latestFirmware(){
+    Serial.println("Checking for latest firmware version");
+    //Setting up the endpoint
+    endpoint = "/firmware/latest";
+    String firmwareServer = server_name + endpoint;
+    //Serial.println("Firmware server: " + firmwareServer);
+
+    //Testing server connection
+    Serial.println("Starting HTTPS connection...");
+    if (!firmwareClient.begin(testClient, firmwareServer)) {
+        Serial.println("Failed to start HTTPS connection");
+        firmwareClient.end();
+        return "error";
+    }
+    Serial.println("Connected to the server");
+
+    //Adding headers
+    String authHeader = "Bearer " + jwt;
+    firmwareClient.addHeader("Authorization", authHeader);
+    firmwareClient.addHeader("Content-Type", "application/json");
+
+    //Getting
+    int httpCode = firmwareClient.GET();
+
+    Serial.print("Firmware HTTP Code: ");
+    Serial.println(httpCode);
+    String responseBody = firmwareClient.getString();
+    //Serial.println("Response body: " + responseBody);
+    firmwareClient.end();
+    if(httpCode > 0){
+        if(httpCode == 200){
+
+            //Parsing the response
+            JsonDocument firmwareData;
+            DeserializationError error = deserializeJson(firmwareData, responseBody);
+            if(error){
+                Serial.print("deserializeJson() failed: ");
+                Serial.println(error.c_str());
+                return "error";
+            }
+            String version = firmwareData["version"];
+
+            Serial.println("Latest firmware version: " + version);
+            digitalWrite(led_1, HIGH);
+            delay(100);
+            digitalWrite(led_1, LOW);
+            return version;
+        }
+        else if (httpCode == 401){
+            Serial.println("Unauthorized");
+            authenticated = false;
+            return "error";
+        } else if(httpCode == 400){
+            Serial.println("Bad request");
+            return "error";
+        } else if(httpCode == 500){
+            Serial.println("Internal server error");
+            return "error";
+        } else {
+            Serial.println("Failed to update machine status: Unknown error");
+            return "error";
+        }
+    }
+    else{
+        Serial.println("Error on HTTP request");
+        return "error";
+    }
 }

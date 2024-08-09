@@ -66,7 +66,7 @@ int mpu_period = 100; //In milliseconds
 
 void loop() {
     // Used for ezTime events
-    //events();
+    events();
 
     //Updating the tick functions timers
     tick_timer2 = millis();

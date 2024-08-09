@@ -14,9 +14,9 @@
 #include "wifi_secrets.h"
 
 extern String FIRMWARE_VERSION;
-extern int FIRMWARE_VERSION_MAJOR;
-extern int FIRMWARE_VERSION_MINOR;
-extern int FIRMWARE_VERSION_PATCH ;
+extern const int FIRMWARE_VERSION_MAJOR;
+extern const int FIRMWARE_VERSION_MINOR;
+extern const int FIRMWARE_VERSION_PATCH ;
 
 extern Timezone myTimezone;
 extern String timezone_name;
