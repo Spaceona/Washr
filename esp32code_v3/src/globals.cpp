@@ -8,6 +8,8 @@
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 #include <ezTime.h>
+#include <preferences.h>
+#include "flashStorage.h"
 #include "globals.h"
 
 //Firmware version
@@ -43,8 +45,8 @@ String jwt = "";
 boolean authenticated = false;
 
 // Setting up the wifi details
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
+String ssid = getWifiSsid();
+String password = getWifiPassword();
 String mac_address;
 
 // Setting up the LEDs
@@ -54,3 +56,6 @@ int led_2 = D2;
 boolean machineStatus = false;
 //Confidence value for the machine detection
 int detectionConfidence = 0;
+
+//Setting up the flash storage
+Preferences flashStorage;

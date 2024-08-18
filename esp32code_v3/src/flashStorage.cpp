@@ -8,49 +8,50 @@
 #include "globals.h"
 #include "flashStorage.h"
 
-Preferences flashStorage;
+void flashStorageInit() {
+    flashStorage.begin("wifiCreds", false);
+    flashStorage.begin("hasCreds", false);
+}
 
 boolean hasWifiCredentials() {
-    flashStorage.begin("hasWifiCredentials", false);
-    boolean hasCredentials =  flashStorage.getBool("hasWifiCredentials", false);
-    flashStorage.end();
+    flashStorage.begin("hasCreds", false);
+    boolean hasCredentials =  flashStorage.getBool("hasCreds", false);
+    Serial.println("Has credentials: " + String(hasCredentials));
     return hasCredentials;
 }
 
 void setHasWifiCredentials(boolean hasCredentials) {
-    flashStorage.begin("hasWifiCredentials", false);
-    flashStorage.putBool("hasWifiCredentials", hasCredentials);
-    flashStorage.end();
+    flashStorage.begin("hasCreds", false);
+    flashStorage.putBool("hasCreds", hasCredentials);
 }
 
 void setWifiCredentials(String newSsid, String newPassword) {
-    flashStorage.begin("wifiCredentials", false);
+    flashStorage.begin("wifiCreds", false);
     flashStorage.putString("ssid", newSsid);
     flashStorage.putString("password", newPassword);
-    flashStorage.begin("hasWifiCredentials", false);
-    flashStorage.putBool("hasWifiCredentials", true);
-    flashStorage.end();
+    flashStorage.begin("hasCreds", false);
+    flashStorage.putBool("hasCreds", true);
 }
 
 String getWifiSsid() {
-    flashStorage.begin("wifiCredentials", false);
+    flashStorage.begin("wifiCreds", false);
     String storedSsid = flashStorage.getString("ssid", "");
-    flashStorage.end();
     return ssid;
 }
 
 String getWifiPassword() {
-    flashStorage.begin("wifiCredentials", false);
+    flashStorage.begin("wifiCreds", false);
     String storedPassword = flashStorage.getString("password", "");
-    flashStorage.end();
     return storedPassword;
 }
 
 void clearWifiCredentials() {
-    flashStorage.begin("wifiCredentials", false);
+    flashStorage.begin("wifiCreds", false);
     flashStorage.clear();
-    flashStorage.end();
-    flashStorage.begin("hasWifiCredentials", false);
-    flashStorage.putBool("hasWifiCredentials", false);
+    flashStorage.begin("hasCreds", false);
+    flashStorage.putBool("hasCreds", false);
+}
+
+void flashStorageClose(){
     flashStorage.end();
 }

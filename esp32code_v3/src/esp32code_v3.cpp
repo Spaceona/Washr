@@ -21,14 +21,11 @@
 Adafruit_MPU6050 mpu;
 
 
-// Setting up the https client for making HTTPS requests
-HTTPClient https;
-
 
 void setup() {
     // Setting up the Serial
     Serial.begin(115200);
-    delay(3000);
+    delay(1000);
 
     // Setting up the Serial1 for debugging
     //Serial1.begin(115200, SERIAL_8N1, D7, D6);
@@ -37,28 +34,17 @@ void setup() {
     pinMode(led_1, OUTPUT);
     pinMode(led_2, OUTPUT);
 
+    //This is just used to allow the user to have time to connect to serial
+    delay(5000);
+
+    flashStorageInit();
+
     //Initializing MPU
     mpu_init(mpu, MPU6050_RANGE_8_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
 
-    //Getting the wifi credentials
-    if(!hasWifiCredentials()){
-        Serial.println("Failed to get wifi credentials");
-    } //I might want to move all the inits after this to the tick function so that I can loop it until it is set up
-    //Should probably have a state for waiting until it gets wifi credentials and then a state for the wifi set up and then the transmit states
+    //setting the wifi credentials for testing
+    setWifiCredentials(WIFI_SSID, WIFI_PASSWORD);
 
-    //Initializing the Wifi
-    wifi_init(server_name, https);
-
-    //Waiting for the clock to sync
-    waitForSync();
-
-    //Setting up the time to check for firmware updates (also sets up the clock)
-    time_t firmwareTime = firmwareUpdateTime();
-
-    //Setting up the firmware check event
-    myTimezone.setEvent(firmwareCheck, firmwareTime);
-
-    //serverAuth();
 }
 
 // Setting up the timers for the tick function state machine

@@ -11,6 +11,7 @@
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 #include <ezTime.h>
+#include <preferences.h>
 #include "wifi_secrets.h"
 
 extern String FIRMWARE_VERSION;
@@ -40,11 +41,13 @@ extern boolean authenticated;
 extern int led_1;
 extern int led_2;
 
-extern const char* ssid;
-extern const char* password;
+extern String ssid;
+extern String password;
 extern String mac_address;
 
 extern boolean machineStatus;
 extern int detectionConfidence;
+
+extern Preferences flashStorage;
 
 #endif //GLOBALS_H

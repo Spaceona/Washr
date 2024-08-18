@@ -10,6 +10,8 @@
 #include <ArduinoJson.h>
 #include "globals.h"
 
+void flashStorageInit();
+
 boolean hasWifiCredentials();
 
 void setHasWifiCredentials(boolean hasCredentials);
@@ -21,5 +23,7 @@ String getWifiSsid();
 String getWifiPassword();
 
 void clearWifiCredentials();
+
+void flashStorageClose();
 
 #endif //ESP32CODE_V3_FLASHSTORAGE_H
