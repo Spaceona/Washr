@@ -14,6 +14,7 @@
 #include "MPUFunctions.h"
 #include "TickFunction.h"
 #include "WifiFunctions.h"
+#include "flashStorage.h"
 
 
 // Setting up the MPU
@@ -27,7 +28,7 @@ HTTPClient https;
 void setup() {
     // Setting up the Serial
     Serial.begin(115200);
-    delay(1000);
+    delay(3000);
 
     // Setting up the Serial1 for debugging
     //Serial1.begin(115200, SERIAL_8N1, D7, D6);
@@ -38,6 +39,12 @@ void setup() {
 
     //Initializing MPU
     mpu_init(mpu, MPU6050_RANGE_8_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
+
+    //Getting the wifi credentials
+    if(!hasWifiCredentials()){
+        Serial.println("Failed to get wifi credentials");
+    } //I might want to move all the inits after this to the tick function so that I can loop it until it is set up
+    //Should probably have a state for waiting until it gets wifi credentials and then a state for the wifi set up and then the transmit states
 
     //Initializing the Wifi
     wifi_init(server_name, https);

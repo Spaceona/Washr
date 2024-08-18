@@ -7,9 +7,11 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
+#include <ArduinoJson.h>
 #include <ezTime.h>
-#include "wifi_secrets.h"
 #include "globals.h"
+#include "wifi_secrets.h"
+
 
 //Initializes the wifi
 void wifi_init(String server_name, HTTPClient& https);
