@@ -45,8 +45,8 @@ String jwt = "";
 boolean authenticated = false;
 
 // Setting up the wifi details
-String ssid = getWifiSsid();
-String password = getWifiPassword();
+String ssid = "";
+String password = "";
 String mac_address;
 
 // Setting up the LEDs

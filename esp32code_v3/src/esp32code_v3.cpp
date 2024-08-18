@@ -17,6 +17,9 @@
 #include "flashStorage.h"
 
 
+
+
+
 // Setting up the MPU
 Adafruit_MPU6050 mpu;
 

@@ -8,50 +8,92 @@
 #include "globals.h"
 #include "flashStorage.h"
 
-void flashStorageInit() {
-    flashStorage.begin("wifiCreds", false);
-    flashStorage.begin("hasCreds", false);
+boolean flashStorageInit(){
+    flashStorage.end();
+    flashStorage.begin("creds", true, "nvs");
+
+    boolean flashInit = flashStorage.isKey("nvsInit");
+
+    if(!flashInit){
+        flashStorage.end();
+        flashStorage.begin("creds", false, "nvs");
+        flashStorage.putBool("hasCreds", false);
+        flashStorage.putString("ssid", "");
+        flashStorage.putString("password", "");
+        flashStorage.putBool("nvsInit", true);
+    }
+    flashStorage.end();
+    return true;
 }
 
 boolean hasWifiCredentials() {
-    flashStorage.begin("hasCreds", false);
+    flashStorage.end();
+    flashStorage.begin("creds", true, "nvs");
+
+    if(flashStorage.getBool("nvsInit", false) == false){
+        return false;
+    }
+
     boolean hasCredentials =  flashStorage.getBool("hasCreds", false);
     Serial.println("Has credentials: " + String(hasCredentials));
+    flashStorage.end();
     return hasCredentials;
 }
 
-void setHasWifiCredentials(boolean hasCredentials) {
-    flashStorage.begin("hasCreds", false);
+boolean setHasWifiCredentials(boolean hasCredentials) {
+    flashStorage.end();
+    flashStorage.begin("creds", false, "nvs");
+
+    if(flashStorage.getBool("nvsInit", false) == false){
+        return false;
+    }
+
     flashStorage.putBool("hasCreds", hasCredentials);
+    flashStorage.end();
+    return true;
 }
 
-void setWifiCredentials(String newSsid, String newPassword) {
-    flashStorage.begin("wifiCreds", false);
+boolean setWifiCredentials(String newSsid, String newPassword) {
+    flashStorage.end();
+    flashStorage.begin("creds", false, "nvs");
+
+    if(flashStorage.getBool("nvsInit", false) == false){
+        return false;
+    }
+
     flashStorage.putString("ssid", newSsid);
     flashStorage.putString("password", newPassword);
-    flashStorage.begin("hasCreds", false);
     flashStorage.putBool("hasCreds", true);
+
+    //Debug print statements
+    // Serial.println("SSID: " + flashStorage.getString("ssid", ""));
+    // Serial.println("Password: " + flashStorage.getString("password", ""));
+    // Serial.println("Has credentials: " + String(flashStorage.getBool("hasCreds", false)));
+
+    flashStorage.end();
+    return true;
 }
 
 String getWifiSsid() {
-    flashStorage.begin("wifiCreds", false);
+    flashStorage.end();
+    flashStorage.begin("creds", true, "nvs");
     String storedSsid = flashStorage.getString("ssid", "");
-    return ssid;
+    flashStorage.end();
+    return storedSsid;
 }
 
 String getWifiPassword() {
-    flashStorage.begin("wifiCreds", false);
+    flashStorage.end();
+    flashStorage.begin("creds", false, "nvs");
     String storedPassword = flashStorage.getString("password", "");
+    flashStorage.end();
     return storedPassword;
 }
 
 void clearWifiCredentials() {
-    flashStorage.begin("wifiCreds", false);
+    flashStorage.end();
+    flashStorage.begin("creds", false, "nvs");
     flashStorage.clear();
-    flashStorage.begin("hasCreds", false);
     flashStorage.putBool("hasCreds", false);
-}
-
-void flashStorageClose(){
     flashStorage.end();
 }

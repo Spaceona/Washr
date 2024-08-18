@@ -10,6 +10,7 @@
 #include "globals.h"
 #include "wifi_secrets.h"
 #include "WifiFunctions.h"
+#include "flashStorage.h"
 
 
 

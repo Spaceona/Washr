@@ -28,12 +28,12 @@ enum States {
 // Setting up the tick function
 void tickFunction() {
     // Transitions
+    //Serial.println("Starting State: " + String(Sensor_State)); //Debugging statement
     switch (Sensor_State) {
         case Start:
-            if(!hasWifiCredentials()){
+            if(WiFi.status() != WL_CONNECTED){
                 Sensor_State = getCreds;
-            }
-            if(!authenticated){
+            } else if(!authenticated){
                 Sensor_State = Authenticate;
                 //Serial.println("Next state: Authenticate");
             } else {
@@ -98,13 +98,18 @@ void tickFunction() {
             break;
     }
 
+    //Serial.println("Next State: " + String(Sensor_State)); //Debugging statement
+
     // State logic
     switch (Sensor_State) {
         case Start:
             // State logic would go here if there was any
             break;
         case getCreds:
+            //Long term this is going to connect to bluetooth to get the credentials
             //Serial.println("Getting Credentials");
+            ssid = getWifiSsid();
+            password = getWifiPassword();
             break;
         case wifiInit: {
             //Initializing the Wifi
