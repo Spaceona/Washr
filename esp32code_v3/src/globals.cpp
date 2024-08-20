@@ -24,15 +24,9 @@ String timezone_name = "America/New_York";
 WiFiClientSecure client;
 
 //TODO change this to the backend server when backend changes are merged
-String server_name = "http://172.31.2.17:3000";
+String server_name = "http://10.1.1.194:3001";
 String endpoint = "";
-String serverPort = "3000";
-
-//Setting up the endpoints for posting machine data
-String clientName = "lafayette.edu";
-String building = "watsonhall";
-String type = "washer";
-String id = "0";
+String serverPort = "3001";
 
 
 //A secret key which is different for each SpaceOna client (used for authentication)

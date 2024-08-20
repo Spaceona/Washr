@@ -74,7 +74,7 @@ void wifi_init(String server_name, HTTPClient& https) {
     //TODO use secure client
     //Testing if the certificate is installed correctly
     //Serial.println("Testing certificate and connection to server");
-    if (!client.connect("api.spaceona.com", 3000)) {
+    if (!client.connect("10.1.1.194", 3001)) {
         Serial.println("Connection failed");
         return;
     }
@@ -130,7 +130,7 @@ boolean serverAuth(){
 
     if(httpCode > 0){
         String responseBody = authClient.getString();
-        //Serial.println("Response body: " + responseBody);
+        Serial.println("Response body: " + responseBody);
         if(httpCode == 200){
             DeserializationError error = deserializeJson(auth_data, responseBody);
 
@@ -139,10 +139,14 @@ boolean serverAuth(){
                 Serial.println(error.c_str());
                 authClient.end();
                 return false;
+            } else if(!auth_data.containsKey("Token")){
+                Serial.println("Bad response from server");
+                authClient.end();
+                return false;
             }
 
             const char* message = auth_data["message"]; // "Authenticated"
-            jwt = String(auth_data["jwt"].as<const char*>()); //converting to a string
+            jwt = String(auth_data["Token"].as<const char*>()); //converting to a string
             //Serial.println("JWT: " + jwt);
             //Serial.println("");
             authenticated = true;
@@ -171,7 +175,7 @@ HTTPClient statusClient;
 
 void machineStatusUpdate(boolean currentMachineStatus){
     //Setting up the endpoint
-    endpoint = "/update/" + clientName + "/" + building + "/" + type + "/" + id;
+    endpoint = "/status/update";
     String statusServer = server_name + endpoint;
     //Serial.println("Status server: " + statusServer);
 
@@ -186,6 +190,7 @@ void machineStatusUpdate(boolean currentMachineStatus){
 
     //Setting up the data to be sent
     JsonDocument statusData;
+    statusData["mac_address"] = mac_address;
     statusData["firmwareVersion"] = FIRMWARE_VERSION;
     statusData["status"] = currentMachineStatus;
     statusData["confidence"] = detectionConfidence;
