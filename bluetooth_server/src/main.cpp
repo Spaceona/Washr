@@ -15,12 +15,11 @@
 #define SECRET_UUID "27ea72f0-6f5a-4274-9220-80dcb1778570"
 
 
-class WiFiCredentials {
-public:
-    String ssid;
-    String password;
-    String key;
-};
+
+String ssid = "ESPDevNetwork";
+String password = "password";
+String key = "spaceona";
+
 
 class MyCallbacks : public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
@@ -40,11 +39,10 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 
 class WiFiCallbacks: public BLECharacteristicCallbacks {
 private:
-    WiFiCredentials *credentials;
     String uuid;
 
 public:
-    WiFiCallbacks(WiFiCredentials *creds, String uuid) : credentials(creds), uuid(uuid) {}
+    WiFiCallbacks(String uuid) : uuid(uuid) {}
 
     void onWrite(BLECharacteristic *pCharacteristic) override {
         String value = String(pCharacteristic->getValue().c_str());
@@ -59,14 +57,11 @@ public:
             Serial.println(value);
 
             if (uuid == SSID_UUID) {
-                credentials->ssid = value;
-                Serial.println("SSID: " + credentials->ssid);
+
             } else if (uuid == PASSWORD_UUID) {
-                credentials->password = value;
-                Serial.println("Password: " + credentials->password);
+
             } else if (uuid == CLIENTKEY_UUID) {
-                credentials->key = value;
-                Serial.println("Client Key: " + credentials->key);
+
             } else if (uuid == SECRET_UUID) {
                 Serial.println("Secret: " + value);
             }
@@ -89,9 +84,7 @@ class MyServerCallbacks : public BLEServerCallbacks {
 void setup() {
     Serial.begin(115200);
 
-    WiFiCredentials credentials;
-
-    BLEDevice::init("MyESP32");
+    BLEDevice::init("WashrProg");
     BLEServer *pServer = BLEDevice::createServer();
     pServer->setCallbacks(new MyServerCallbacks());
 
@@ -115,9 +108,10 @@ void setup() {
     //Setting up the characteristic for the SSID
     BLECharacteristic *ssidCharacteristic = pService->createCharacteristic(
             SSID_UUID,
-            BLECharacteristic::PROPERTY_WRITE
+            BLECharacteristic::PROPERTY_READ
     );
-    ssidCharacteristic->setCallbacks(new WiFiCallbacks(&credentials, SSID_UUID));
+    ssidCharacteristic->setCallbacks(new WiFiCallbacks(SSID_UUID));
+    ssidCharacteristic->setValue(ssid.c_str());
 
     //Descriptor for the SSID characteristic (so it says "SSID" in an app)
     BLEDescriptor *ssidDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x2901));
@@ -128,9 +122,10 @@ void setup() {
     //Setting up the characteristic for the password
     BLECharacteristic *passwordCharacteristic = pService->createCharacteristic(
             PASSWORD_UUID,
-            BLECharacteristic::PROPERTY_WRITE
+            BLECharacteristic::PROPERTY_READ
     );
-    passwordCharacteristic->setCallbacks(new WiFiCallbacks(&credentials, PASSWORD_UUID));
+    passwordCharacteristic->setCallbacks(new WiFiCallbacks(PASSWORD_UUID));
+    passwordCharacteristic->setValue(password.c_str());
 
     //Descriptor for the password characteristic (so it says "Password" in an app)
     BLEDescriptor *passwordDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x2901));
@@ -141,9 +136,10 @@ void setup() {
     //Setting up the characteristic for the client key
     BLECharacteristic *keyCharacteristic = pService->createCharacteristic(
             CLIENTKEY_UUID,
-            BLECharacteristic::PROPERTY_WRITE
+            BLECharacteristic::PROPERTY_READ
     );
-    keyCharacteristic->setCallbacks(new WiFiCallbacks(&credentials, CLIENTKEY_UUID));
+    keyCharacteristic->setCallbacks(new WiFiCallbacks(CLIENTKEY_UUID));
+    keyCharacteristic->setValue(key.c_str());
 
     //Descriptor for the key characteristic (so it says "Client Key" in an app)
     BLEDescriptor *keyDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x2901));
@@ -157,8 +153,8 @@ void setup() {
     pAdvertising->start();
 
     //Setting up the security
-    //BLESecurity *pSecurity = new BLESecurity();
-    //pSecurity->setStaticPIN(123456);
+    BLESecurity *pSecurity = new BLESecurity();
+    pSecurity->setStaticPIN(123456);
 
 
 }
