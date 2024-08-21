@@ -18,9 +18,9 @@ void wifi_init(String server_name, HTTPClient& https);
 
 void wifiConnect();
 
-boolean serverAuth();
+int serverAuth();
 
-void machineStatusUpdate(boolean currentMachineStatus);
+int machineStatusUpdate(boolean currentMachineStatus);
 
 //Used to check a webserver for a new firmware version (WIP)
 void otaUpdate(String updateFirmware);
@@ -35,5 +35,9 @@ void firmwareCheck();
 time_t firmwareUpdateTime();
 
 String latestFirmware();
+
+time_t heartbeatUpdateTime();
+
+void sendHeartbeat();
 
 #endif

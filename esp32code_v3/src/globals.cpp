@@ -50,6 +50,7 @@ int led_2 = D2;
 boolean machineStatus = false;
 //Confidence value for the machine detection
 int detectionConfidence = 0;
+boolean heartbeatSent = false;
 
 //Setting up the flash storage
 Preferences flashStorage;

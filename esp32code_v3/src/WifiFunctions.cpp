@@ -99,7 +99,7 @@ void wifiConnect(){
 WiFiClient testClient;
 HTTPClient authClient;
 
-boolean serverAuth(){
+int serverAuth(){
     String auth_server;
     JsonDocument device_data;
     JsonDocument auth_data;
@@ -114,9 +114,9 @@ boolean serverAuth(){
     }
 
 
-    device_data["mac"] = mac_address;
-    device_data["firmwareVersion"] = FIRMWARE_VERSION;
-    device_data["clientKey"] = clientKey;
+    device_data["mac_address"] = mac_address;
+    device_data["firmware_version"] = FIRMWARE_VERSION;
+    device_data["client_key"] = clientKey;
 
     String device_data_string;
     serializeJson(device_data, device_data_string);
@@ -139,11 +139,11 @@ boolean serverAuth(){
                 Serial.print("deserializeJson() failed: ");
                 Serial.println(error.c_str());
                 authClient.end();
-                return false;
+                return -1;
             } else if(!auth_data.containsKey("Token")){
                 Serial.println("Bad response from server");
                 authClient.end();
-                return false;
+                return -1;
             }
 
             const char* message = auth_data["message"]; // "Authenticated"
@@ -155,26 +155,25 @@ boolean serverAuth(){
             delay(50);
             digitalWrite(led_1, LOW);
             authClient.end();
-            return true;
+            return 200;
         } else if (httpCode == 400){
             Serial.println("Unauthorized");
             authClient.end();
             authenticated = false;
-            return false;
+            return 400;
         }
-    }
-    else{
+    } else{
         Serial.println("Error on HTTP request");
         authClient.end();
-        return false;
+        return -1;
     }
     authClient.end();
-    return false;
+    return -1;
 }
 
 HTTPClient statusClient;
 
-void machineStatusUpdate(boolean currentMachineStatus){
+int machineStatusUpdate(boolean currentMachineStatus){
     //Setting up the endpoint
     endpoint = "/status/update";
     String statusServer = server_name + endpoint;
@@ -185,7 +184,7 @@ void machineStatusUpdate(boolean currentMachineStatus){
     if (!statusClient.begin(testClient, statusServer)) {
         Serial.println("Failed to start HTTPS connection");
         statusClient.end();
-        return;
+        return -1;
     }
     Serial.println("Connected to the server");
 
@@ -230,10 +229,11 @@ void machineStatusUpdate(boolean currentMachineStatus){
         } else {
             Serial.println("Failed to update machine status: Unknown error");
         }
-    }
-    else{
+        return httpCode;
+    } else{
         Serial.println("Error on HTTP request");
     }
+    return -1;
 }
 
 //TODO change this to a secure connection when it is implemented on the server
@@ -331,7 +331,6 @@ void firmwareCheck() {
 }
 
 
-
 HTTPClient firmwareClient;
 
 String latestFirmware(){
@@ -401,4 +400,47 @@ String latestFirmware(){
         Serial.println("Error on HTTP request");
         return "error";
     }
+}
+
+//Returns 15 minutes from current time
+time_t heartbeatUpdateTime() {
+    time_t now = myTimezone.now();
+
+    tmElements_t tm;
+    breakTime(now, tm);
+
+    // Add 15 minutes to the current time
+    tm.Minute += 15;
+
+    // Handle overflow of minutes
+    if (tm.Minute >= 60) {
+        tm.Minute -= 60;
+        tm.Hour += 1;
+    }
+
+    // Handle overflow of hours
+    if (tm.Hour >= 24) {
+        tm.Hour -= 24;
+        tm.Day += 1;
+    }
+
+    //Return the new time
+    return makeTime(tm);
+}
+
+//Sending the heartbeat to the server every x minutes
+void sendHeartbeat(){
+    time_t heartbeatTime = heartbeatUpdateTime();
+    Serial.println("Event callback reached. Sending heartbeat");
+
+    int returnCode = machineStatusUpdate(machineStatus);
+
+    if(returnCode == 200){
+        Serial.println("Heartbeat sent successfully");
+        heartbeatSent = true;
+    } else {
+        Serial.println("Failed to send heartbeat");
+        heartbeatSent = false;
+    }
+    //TODO figure out what to do if the heartbeat isn't sent successfully
 }

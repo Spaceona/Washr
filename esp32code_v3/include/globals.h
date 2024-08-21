@@ -30,11 +30,6 @@ extern String server_name;
 extern String endpoint;
 extern String serverPort;
 
-extern String clientName;
-extern String building;
-extern String type;
-extern String id;
-
 extern String jwt;
 extern boolean authenticated;
 
@@ -47,6 +42,7 @@ extern String mac_address;
 
 extern boolean machineStatus;
 extern int detectionConfidence;
+extern boolean heartbeatSent;
 
 extern Preferences flashStorage;
 
