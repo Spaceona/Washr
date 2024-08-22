@@ -9,7 +9,7 @@
 #define I2C_SCL_PIN 5
 
 // Instantiate an ICM42670 with LSB address set to 0
-ICM42670 IMU(Wire,0);
+//ICM42670 IMU(Wire,0);
 
 void setup() {
 
@@ -19,14 +19,16 @@ void setup() {
     pinMode(LED2_PIN, OUTPUT);
 
     //Setting up I2C
-    Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+    //Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
 
     int ret;
     Serial.begin(115200);
-    while(!Serial) {}
+    while(!Serial) {
+
+    }
 
     // Initializing the ICM42670
-    ret = IMU.begin();
+    /*ret = IMU.begin();
     if (ret != 0) {
         Serial.print("ICM42670 initialization failed: ");
         Serial.println(ret);
@@ -34,7 +36,7 @@ void setup() {
     // Accel ODR = 100 Hz and Full Scale Range = 16G
     IMU.startAccel(100,16);
     // Gyro ODR = 100 Hz and Full Scale Range = 2000 dps
-    IMU.startGyro(100,2000);
+    IMU.startGyro(100,2000);*/
     // Wait IMU to start
     delay(100);
 }
@@ -49,7 +51,7 @@ void loop() {
     inv_imu_sensor_event_t imu_event;
 
     // Get last event
-    IMU.getDataFromRegisters(imu_event);
+    /*IMU.getDataFromRegisters(imu_event);
 
     // Format data for Serial Plotter
     Serial.print("AccelX:");
@@ -65,7 +67,7 @@ void loop() {
     Serial.print("GyroZ:");
     Serial.println(imu_event.gyro[2]);
     Serial.print("Temperature:");
-    Serial.println(imu_event.temperature);
+    Serial.println(imu_event.temperature);*/
 
     // Run @ ODR 100Hz
     delay(1000);
@@ -73,7 +75,7 @@ void loop() {
     digitalWrite(LED1_PIN, LOW);
     digitalWrite(LED2_PIN, LOW);
 
-    IMU.getDataFromRegisters(imu_event);
+    /*IMU.getDataFromRegisters(imu_event);
 
     // Format data for Serial Plotter
     Serial.print("AccelX:");
@@ -89,6 +91,6 @@ void loop() {
     Serial.print("GyroZ:");
     Serial.println(imu_event.gyro[2]);
     Serial.print("Temperature:");
-    Serial.println(imu_event.temperature);
+    Serial.println(imu_event.temperature);*/
     delay(1000);
 }
