@@ -43,6 +43,9 @@ String ssid = "";
 String password = "";
 String mac_address;
 
+//Setting up the parameterized versions of timing variables
+int heartbeatPeriod = 5;
+
 // Setting up the LEDs
 int led_1 = D3;
 int led_2 = D2;
@@ -50,6 +53,7 @@ int led_2 = D2;
 boolean machineStatus = false;
 //Confidence value for the machine detection
 int detectionConfidence = 0;
+boolean heartbeatSent = false;
 
 //Setting up the flash storage
 Preferences flashStorage;
