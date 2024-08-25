@@ -43,7 +43,7 @@ void setup() {
     flashStorageInit();
 
     //Initializing MPU
-    mpu_init(mpu, MPU6050_RANGE_8_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
+    mpu_init(mpu, MPU6050_RANGE_2_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
 
     //setting the wifi credentials for testing
     setWifiCredentials(WIFI_SSID, WIFI_PASSWORD);

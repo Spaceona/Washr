@@ -53,6 +53,9 @@ void wifi_init(String server_name, HTTPClient& https) {
     Serial.println("");
 
     Serial.println("\nConnected to the WiFi network");
+
+    Serial.println("Signal strength (RSSI): " + String(WiFi.RSSI()));
+
     Serial.print("Local ESP32 IP: ");
     Serial.println(WiFi.localIP());
 
