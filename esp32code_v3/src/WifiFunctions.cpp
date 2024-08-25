@@ -403,14 +403,14 @@ String latestFirmware(){
 }
 
 //Returns 15 minutes from current time
-time_t heartbeatUpdateTime() {
+time_t heartbeatUpdateTime(int minutePeriod) {
     time_t now = myTimezone.now();
 
     tmElements_t tm;
     breakTime(now, tm);
 
     // Add 15 minutes to the current time
-    tm.Minute += 15;
+    tm.Minute += minutePeriod;
 
     // Handle overflow of minutes
     if (tm.Minute >= 60) {
@@ -430,7 +430,7 @@ time_t heartbeatUpdateTime() {
 
 //Sending the heartbeat to the server every x minutes
 void sendHeartbeat(){
-    time_t heartbeatTime = heartbeatUpdateTime();
+    time_t heartbeatTime = heartbeatUpdateTime(heartbeatPeriod);
     Serial.println("Event callback reached. Sending heartbeat");
 
     int returnCode = machineStatusUpdate(machineStatus);

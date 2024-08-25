@@ -40,6 +40,8 @@ extern String ssid;
 extern String password;
 extern String mac_address;
 
+extern int heartbeatPeriod;
+
 extern boolean machineStatus;
 extern int detectionConfidence;
 extern boolean heartbeatSent;

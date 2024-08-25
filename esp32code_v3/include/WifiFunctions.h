@@ -36,7 +36,7 @@ time_t firmwareUpdateTime();
 
 String latestFirmware();
 
-time_t heartbeatUpdateTime();
+time_t heartbeatUpdateTime(int minutePeriod);
 
 void sendHeartbeat();
 
