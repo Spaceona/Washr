@@ -239,6 +239,69 @@ int machineStatusUpdate(boolean currentMachineStatus){
     return -1;
 }
 
+
+//TODO swap the testclient to just one client
+int onboardBoard(){
+    //Setting up the endpoint
+    endpoint = "/onboard/board";
+    String onboardServer = server_name + endpoint;
+    //Serial.println("Onboard server: " + onboardServer);
+
+    //Testing server connection
+    Serial.println("Starting HTTPS connection...");
+    if (!statusClient.begin(testClient, onboardServer)) {
+        Serial.println("Failed to start HTTPS connection");
+        statusClient.end();
+        return -1;
+    }
+
+    //Setting up the data
+    JsonDocument onboardData;
+    onboardData["mac_address"] = mac_address;
+    onboardData["client_name"] = clientName;
+    onboardData["client_key"] = clientKey;
+    String onboardDataString;
+    serializeJson(onboardData, onboardDataString);
+    //Adding headers
+    //TODO check the headers
+
+    //Posting
+    int httpCode = statusClient.POST(onboardDataString);
+
+    Serial.print("Status HTTP Code: ");
+    Serial.println(httpCode);
+    String responseBody = statusClient.getString();
+    //Serial.println("Response body: " + responseBody);
+    statusClient.end();
+    if(httpCode > 0){
+        if(httpCode == 200){
+            Serial.println("Onboarded board correctly");
+            digitalWrite(led_2, HIGH);
+            delay(100);
+            digitalWrite(led_2, LOW);
+            setupComplete = true;
+        }
+        else if (httpCode == 401){
+            Serial.println("Unauthorized");
+            setupComplete = false;
+        } else if(httpCode == 400){
+            Serial.println("Bad request");
+            setupComplete = false;
+        } else if(httpCode == 500){
+            Serial.println("Internal server error");
+            setupComplete = false;
+        } else {
+            Serial.println("Failed to update machine status: Unknown error");
+            setupComplete = false;
+        }
+        return httpCode;
+    } else {
+        Serial.println("Error on HTTP request");
+    }
+    setupComplete = false;
+    return -1;
+}
+
 //TODO change this to a secure connection when it is implemented on the server
 void otaUpdate(String updateFirmware) {
     Serial.println("Starting OTA update check");

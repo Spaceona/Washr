@@ -25,6 +25,8 @@ int machineStatusUpdate(boolean currentMachineStatus);
 //Used to check a webserver for a new firmware version (WIP)
 void otaUpdate(String updateFirmware);
 
+int onboardBoard();
+
 void requestCallback(HTTPClient* callbackClient);
 
 //Used to sync a clock to a NTP server to get the local time (WIP)

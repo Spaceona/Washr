@@ -34,6 +34,9 @@ String serverPort = "3001";
 //A secret key which is different for each SpaceOna client (used for authentication)
 //We might want an initial key so the board can connect to the backend and then get the correct client key
 String clientKey = "test";
+String clientName = "Lafayette";
+
+boolean setupComplete = false;
 
 String jwt = "";
 boolean authenticated = false;

@@ -20,6 +20,7 @@ enum States {
     Start,
     getCreds,
     wifiInit,
+    Setup,
     Transmit,
     Authenticate,
     Wait
@@ -27,6 +28,9 @@ enum States {
 
 boolean previousMachineStatus;
 int previousHttpCode;
+int setupTries = 0;
+int setupThreshold = 8; //Can change this depend on how fast the tick function is running
+boolean setupFailed = false;
 
 // Setting up the tick function
 void tickFunction() {
@@ -45,6 +49,7 @@ void tickFunction() {
             }
             break;
         case getCreds:
+            //TODO put bluetooth here (or maybe another state) to get the wifi credentials
             if(hasWifiCredentials()){
                 Sensor_State = wifiInit;
             } else {
@@ -53,7 +58,10 @@ void tickFunction() {
             break;
         case wifiInit:
             if(WiFi.status() == WL_CONNECTED){
-                if(!authenticated){
+                if(!setupComplete){
+                    Sensor_State = Setup;
+                    //Serial.println("Next state: Setup");
+                } else if(!authenticated){
                     Sensor_State = Authenticate;
                     //Serial.println("Next state: Authenticate");
                 } else {
@@ -65,6 +73,14 @@ void tickFunction() {
                 //In the future we might want more complex logic here to handle incorrect credentials and other problems
             break;
         }
+        case Setup:
+            //TODO have this go back to the getCreds state if it fails enough times
+            if(setupFailed){
+                Sensor_State = getCreds;
+            } else { //We can assume that if the board is onboarding then it has not been authenticated yet so it needs to do that first
+                Sensor_State = Authenticate;
+            }
+            break;
         case Transmit:
 
             if(WiFi.status() != WL_CONNECTED){
@@ -110,7 +126,7 @@ void tickFunction() {
             previousMachineStatus = false;
             break;
         case getCreds:
-            //Long term this is going to connect to bluetooth to get the credentials
+            //TODO Long term this is going to connect to bluetooth to get the credentials
             //Serial.println("Getting Credentials");
             ssid = getWifiSsid();
             password = getWifiPassword();
@@ -134,6 +150,28 @@ void tickFunction() {
             //serverAuth();
             break;
         }
+        case Setup:
+            //TODO add a setup state to handle the initial setup of the device
+            int setupHttpCode = onboardBoard();
+
+            if(setupHttpCode != 200) {
+                setupTries++;
+                if(setupTries >= setupThreshold){
+                    setupFailed = true;
+                }
+            } else {
+                setupFailed = false;
+            }
+
+            digitalWrite(led_1, HIGH);
+            delay(500);
+            digitalWrite(led_1, LOW);
+            delay(500);
+            digitalWrite(led_1, HIGH);
+            delay(500);
+            digitalWrite(led_1, LOW);
+            setupComplete = true;
+            break;
         case Transmit:
             //Serial.println("Transmitting");
             digitalWrite(led_1, LOW);
