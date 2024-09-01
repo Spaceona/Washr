@@ -40,17 +40,31 @@ const char* test_root_ca =
     "-----END CERTIFICATE-----\n";
 
 
-void wifi_init(String server_name, HTTPClient& https) {
+boolean wifi_init(String server_name, HTTPClient& https) {
     // Setting up the wifi
     WiFi.mode(WIFI_STA); // Optional
     WiFi.begin(ssid, password);
     Serial.println("\nConnecting");
 
+    //TODO add a timeout for the wifi connection
+
+    // Define a timeout period (e.g., 10 seconds)
+    //const unsigned long wifiTimeout = 1000 * 60 * 5; // 5 minutes
+    const unsigned long wifiTimeout = 30000;
+
+// Record the start time
+    unsigned long startTime = millis();
+
     while (WiFi.status() != WL_CONNECTED) {
+        // Check if the timeout period has been exceeded
+        if (millis() - startTime >= wifiTimeout) {
+            Serial.println("WiFi connection timed out");
+            // Handle the timeout case (e.g., reset the device, retry, etc.)
+            return false;
+        }
         Serial.print(".");
         delay(100);
     }
-    Serial.println("");
 
     Serial.println("\nConnected to the WiFi network");
 
@@ -80,11 +94,13 @@ void wifi_init(String server_name, HTTPClient& https) {
     //Serial.println("Testing certificate and connection to server");
     if (!client.connect("10.1.1.194", 3001)) {
         Serial.println("Connection failed");
-        return;
+        //TODO change this later when it becomes a problem
+        return true;
     }
     else {
         Serial.println("Connection successful");
     }
+    return true;
 }
 
 void wifiConnect(){
@@ -242,6 +258,7 @@ int machineStatusUpdate(boolean currentMachineStatus){
 
 //TODO swap the testclient to just one client
 int onboardBoard(){
+    Serial.println("Onboarding board");
     //Setting up the endpoint
     endpoint = "/onboard/board";
     String onboardServer = server_name + endpoint;
@@ -262,6 +279,7 @@ int onboardBoard(){
     onboardData["client_key"] = clientKey;
     String onboardDataString;
     serializeJson(onboardData, onboardDataString);
+    Serial.println("Data to be sent: " + onboardDataString);
     //Adding headers
     //TODO check the headers
 
@@ -280,25 +298,31 @@ int onboardBoard(){
             delay(100);
             digitalWrite(led_2, LOW);
             setupComplete = true;
+            setSetupComplete(setupComplete);
         }
         else if (httpCode == 401){
             Serial.println("Unauthorized");
             setupComplete = false;
+            setSetupComplete(setupComplete);
         } else if(httpCode == 400){
             Serial.println("Bad request");
             setupComplete = false;
+            setSetupComplete(setupComplete);
         } else if(httpCode == 500){
             Serial.println("Internal server error");
             setupComplete = false;
+            setSetupComplete(setupComplete);
         } else {
             Serial.println("Failed to update machine status: Unknown error");
             setupComplete = false;
+            setSetupComplete(setupComplete);
         }
         return httpCode;
     } else {
         Serial.println("Error on HTTP request");
     }
     setupComplete = false;
+    setSetupComplete(setupComplete);
     return -1;
 }
 
@@ -347,6 +371,7 @@ void setClock() {
 }
 
 //Returns 7pm the next day
+//TODO change this to have it be a parameter
 time_t firmwareUpdateTime() {
     setClock();
     time_t now = myTimezone.now();
@@ -468,7 +493,7 @@ String latestFirmware(){
     }
 }
 
-//Returns 15 minutes from current time
+//Returns X minutes from current time
 time_t heartbeatUpdateTime(int minutePeriod) {
     time_t now = myTimezone.now();
 

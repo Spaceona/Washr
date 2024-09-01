@@ -35,7 +35,7 @@ void setup() {
     pinMode(led_2, OUTPUT);
 
     //This is just used to allow the user to have time to connect to serial
-    delay(5000);
+    delay(3000);
 
     flashStorageInit();
 
@@ -50,7 +50,7 @@ void setup() {
 // Setting up the timers for the tick function state machine
 unsigned long tick_timer1 = 0;
 unsigned long tick_timer2 = millis();
-int tick_period = 15000; //In milliseconds
+int tick_period = 5000; //In milliseconds
 //TODO set up a way to change the period of this state machine dynamically from the backend
 
 // Setting up the timers for the mpu debounce state machine

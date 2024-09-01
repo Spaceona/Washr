@@ -14,7 +14,7 @@
 
 
 //Initializes the wifi
-void wifi_init(String server_name, HTTPClient& https);
+boolean wifi_init(String server_name, HTTPClient& https);
 
 void wifiConnect();
 
