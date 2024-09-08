@@ -9,7 +9,9 @@
 #define I2C_SCL_PIN 5
 
 // Instantiate an ICM42670 with LSB address set to 0
-//ICM42670 IMU(Wire,0);
+ICM42670 IMU(Wire,0);
+int accelRange = 4;
+int gyroRange = 2000;
 
 void setup() {
 
@@ -19,7 +21,7 @@ void setup() {
     pinMode(LED2_PIN, OUTPUT);
 
     //Setting up I2C
-    //Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+    Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
 
     int ret;
     Serial.begin(115200);
@@ -28,15 +30,15 @@ void setup() {
     }
 
     // Initializing the ICM42670
-    /*ret = IMU.begin();
+    ret = IMU.begin();
     if (ret != 0) {
         Serial.print("ICM42670 initialization failed: ");
         Serial.println(ret);
     }
     // Accel ODR = 100 Hz and Full Scale Range = 16G
-    IMU.startAccel(100,16);
+    IMU.startAccel(1600,accelRange);
     // Gyro ODR = 100 Hz and Full Scale Range = 2000 dps
-    IMU.startGyro(100,2000);*/
+    IMU.startGyro(1600,gyroRange);
     // Wait IMU to start
     delay(100);
 }
@@ -51,46 +53,43 @@ void loop() {
     inv_imu_sensor_event_t imu_event;
 
     // Get last event
-    /*IMU.getDataFromRegisters(imu_event);
+    IMU.getDataFromRegisters(imu_event);
 
-    // Format data for Serial Plotter
-    Serial.print("AccelX:");
-    Serial.println(imu_event.accel[0]);
-    Serial.print("AccelY:");
-    Serial.println(imu_event.accel[1]);
-    Serial.print("AccelZ:");
-    Serial.println(imu_event.accel[2]);
-    Serial.print("GyroX:");
-    Serial.println(imu_event.gyro[0]);
-    Serial.print("GyroY:");
-    Serial.println(imu_event.gyro[1]);
-    Serial.print("GyroZ:");
-    Serial.println(imu_event.gyro[2]);
-    Serial.print("Temperature:");
-    Serial.println(imu_event.temperature);*/
+    // Convert raw accelerometer data to m/s²
+    double accelX_mps2 = (imu_event.accel[0] / accelRange) / 1000.0;
+    double accelY_mps2 = (imu_event.accel[1] / accelRange) / 1000.0;
+    double accelZ_mps2 = (imu_event.accel[2] / accelRange) / 1000.0;
 
-    // Run @ ODR 100Hz
-    delay(1000);
+// Convert raw gyroscope data to rad/s
+    double gyroX_rads = imu_event.gyro[0] / gyroRange;
+    double gyroY_rads = imu_event.gyro[1] / gyroRange;
+    double gyroZ_rads = imu_event.gyro[2] / gyroRange;
 
-    digitalWrite(LED1_PIN, LOW);
-    digitalWrite(LED2_PIN, LOW);
+// Convert raw temperature data to degrees Celsius
+    double temperature_celsius = (imu_event.temperature / 128.0) + 25.0;
 
-    /*IMU.getDataFromRegisters(imu_event);
+// Print converted values
+    Serial.print("AccelX (m/s^2): ");
+    Serial.println(accelX_mps2);
+    Serial.print("AccelY (m/s^2): ");
+    Serial.println(accelY_mps2);
+    Serial.print("AccelZ (m/s^2): ");
+    Serial.println(accelZ_mps2);
+    Serial.print("GyroX (rad/s): ");
+    Serial.println(gyroX_rads);
+    Serial.print("GyroY (rad/s): ");
+    Serial.println(gyroY_rads);
+    Serial.print("GyroZ (rad/s): ");
+    Serial.println(gyroZ_rads);
+    Serial.print("Temperature (C): ");
+    Serial.println(temperature_celsius);
 
-    // Format data for Serial Plotter
-    Serial.print("AccelX:");
-    Serial.println(imu_event.accel[0]);
-    Serial.print("AccelY:");
-    Serial.println(imu_event.accel[1]);
-    Serial.print("AccelZ:");
-    Serial.println(imu_event.accel[2]);
-    Serial.print("GyroX:");
-    Serial.println(imu_event.gyro[0]);
-    Serial.print("GyroY:");
-    Serial.println(imu_event.gyro[1]);
-    Serial.print("GyroZ:");
-    Serial.println(imu_event.gyro[2]);
-    Serial.print("Temperature:");
-    Serial.println(imu_event.temperature);*/
-    delay(1000);
+
+    delay(50);
+
+    //digitalWrite(LED1_PIN, LOW);
+    //digitalWrite(LED2_PIN, LOW);
+
+
+    //delay(50);
 }
