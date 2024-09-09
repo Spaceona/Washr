@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ICM42670P.h>
 #include <Wire.h>
+#include "IMUConversion.h"
 
 #define LED1_PIN 6
 #define LED2_PIN 10
@@ -10,7 +11,7 @@
 
 // Instantiate an ICM42670 with LSB address set to 0
 ICM42670 IMU(Wire,0);
-int accelRange = 4;
+int accelRange = 2;
 int gyroRange = 2000;
 
 void setup() {
@@ -56,9 +57,9 @@ void loop() {
     IMU.getDataFromRegisters(imu_event);
 
     // Convert raw accelerometer data to m/s²
-    double accelX_mps2 = (imu_event.accel[0] / accelRange) / 1000.0;
-    double accelY_mps2 = (imu_event.accel[1] / accelRange) / 1000.0;
-    double accelZ_mps2 = (imu_event.accel[2] / accelRange) / 1000.0;
+    double accelX_mps2 = accelToMps2(imu_event.accel[0], accelRange);
+    double accelY_mps2 = accelToMps2(imu_event.accel[1], accelRange);
+    double accelZ_mps2 = accelToMps2(imu_event.accel[2], accelRange);
 
 // Convert raw gyroscope data to rad/s
     double gyroX_rads = imu_event.gyro[0] / gyroRange;
