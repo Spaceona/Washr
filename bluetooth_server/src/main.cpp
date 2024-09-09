@@ -2,6 +2,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
+#include <ArduinoBLE.h>
 
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
@@ -153,8 +154,8 @@ void setup() {
     pAdvertising->start();
 
     //Setting up the security
-    BLESecurity *pSecurity = new BLESecurity();
-    pSecurity->setStaticPIN(123456);
+    //BLESecurity *pSecurity = new BLESecurity();
+    //pSecurity->setStaticPIN(123456);
 
 
 }
