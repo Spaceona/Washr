@@ -11,6 +11,7 @@
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 #include <ezTime.h>
+#include <preferences.h>
 #include "wifi_secrets.h"
 
 extern String FIRMWARE_VERSION;
@@ -23,19 +24,12 @@ extern String timezone_name;
 
 extern WiFiClientSecure client;
 
-
+extern String clientName;
+extern String clientKey;
 
 extern String server_name;
 extern String endpoint;
 extern String serverPort;
-
-extern String clientName;
-extern String clientKey;
-
-//TODO old and might be removed
-extern String building;
-extern String type;
-extern String id;
 
 extern String jwt;
 extern boolean authenticated;
@@ -47,7 +41,12 @@ extern String ssid;
 extern String password;
 extern String mac_address;
 
+extern int heartbeatPeriod;
+
 extern boolean machineStatus;
 extern int detectionConfidence;
+extern boolean heartbeatSent;
+
+extern Preferences flashStorage;
 
 #endif //GLOBALS_H

@@ -14,14 +14,12 @@
 #include "MPUFunctions.h"
 #include "TickFunction.h"
 #include "WifiFunctions.h"
+#include "flashStorage.h"
 
 
 // Setting up the MPU
 Adafruit_MPU6050 mpu;
 
-
-// Setting up the https client for making HTTPS requests
-HTTPClient https;
 
 
 void setup() {
@@ -36,22 +34,17 @@ void setup() {
     pinMode(led_1, OUTPUT);
     pinMode(led_2, OUTPUT);
 
+    //This is just used to allow the user to have time to connect to serial
+    delay(5000);
+
+    flashStorageInit();
+
     //Initializing MPU
-    mpu_init(mpu, MPU6050_RANGE_8_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
+    mpu_init(mpu, MPU6050_RANGE_2_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
 
-    //Initializing the Wifi
-    wifi_init(server_name, https);
+    //setting the wifi credentials for testing
+    setWifiCredentials(WIFI_SSID, WIFI_PASSWORD);
 
-    //Waiting for the clock to sync
-    waitForSync();
-
-    //Setting up the time to check for firmware updates (also sets up the clock)
-    time_t firmwareTime = firmwareUpdateTime();
-
-    //Setting up the firmware check event
-    myTimezone.setEvent(firmwareCheck, firmwareTime);
-
-    //serverAuth();
 }
 
 // Setting up the timers for the tick function state machine

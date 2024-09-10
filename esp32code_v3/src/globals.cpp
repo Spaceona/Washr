@@ -8,6 +8,8 @@
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 #include <ezTime.h>
+#include <preferences.h>
+#include "flashStorage.h"
 #include "globals.h"
 
 //Firmware version
@@ -24,31 +26,25 @@ String timezone_name = "America/New_York";
 WiFiClientSecure client;
 
 //TODO change this to the backend server when backend changes are merged
-String server_name = "http://172.31.2.17:3000";
+String server_name = "http://10.1.1.194:3001";
 String endpoint = "";
-String serverPort = "3000";
+String serverPort = "3001";
 
-//Setting up the endpoints for posting machine data
-String clientName = "lafayette.edu";
+String clientName = "test";
 //A secret key which is different for each SpaceOna client (used for authentication)
 //We might want an initial key so the board can connect to the backend and then get the correct client key
 String clientKey = "test";
-
-
-//TODO old and might be removed
-String building = "watsonhall";
-String type = "washer";
-String id = "0";
-
-
 
 String jwt = "";
 boolean authenticated = false;
 
 // Setting up the wifi details
-String ssid = WIFI_SSID;
-String password = WIFI_PASSWORD;
+String ssid = "";
+String password = "";
 String mac_address;
+
+//Setting up the parameterized versions of timing variables
+int heartbeatPeriod = 5;
 
 // Setting up the LEDs
 int led_1 = D3;
@@ -57,3 +53,7 @@ int led_2 = D2;
 boolean machineStatus = false;
 //Confidence value for the machine detection
 int detectionConfidence = 0;
+boolean heartbeatSent = false;
+
+//Setting up the flash storage
+Preferences flashStorage;
