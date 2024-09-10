@@ -52,5 +52,5 @@ void loop() {
         Serial.print(peripheral.advertisedServiceUuid());
         Serial.println();
     }
-    
+
 }
