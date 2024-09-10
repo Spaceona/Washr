@@ -60,7 +60,7 @@ void setup() {
 void loop() {
     BLEDevice central = BLE.central();
 
-    Serial.println("Waiting to connect");
+    //Serial.println("Waiting to connect");
 
     if (central.connected()) {
         Serial.print("Connected to central: ");

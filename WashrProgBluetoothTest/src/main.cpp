@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <ArduinoBLE.h>
 
 #define SERVICE_UUID        "26efde6e-344c-47a4-bf50-78d548220c87"
@@ -7,10 +6,11 @@
 #define CLIENTKEY_UUID      "592e1d83-70a4-4c3e-8917-dcd2c63985fb"
 #define CLIENTNAME_UUID     "27ea72f0-6f5a-4274-9220-80dcb1778570"
 
+
 String ssid = "ESPDevNetwork";
 String password = "password";
-String clientKey = "testkey";
-String clientName = "test2";
+String clientKey = "test2";
+String clientName = "testkey";
 
 void setup() {
     Serial.begin(115200);
@@ -21,61 +21,52 @@ void setup() {
         while (1);
     }
 
-    Serial.println("BLE Central - Scanning for peripherals...");
+    Serial.println("BLE Central - Scanning for peripherals");
 
-    BLE.scan();
+    BLE.scanForUuid(SERVICE_UUID);
 }
 
 void loop() {
     BLEDevice peripheral = BLE.available();
 
-    if (peripheral && peripheral.hasService(SERVICE_UUID)) {
-        Serial.print("Found peripheral with service UUID: ");
-        Serial.println(SERVICE_UUID);
+    if (peripheral) {
+        Serial.print("Found peripheral: ");
+        Serial.println(peripheral.address());
+        Serial.print("Connecting to peripheral: ");
+        Serial.println(peripheral.address());
 
-        if (peripheral.localName() == "Washr") {
-            BLE.stopScan();
-
-            if (peripheral.connect()) {
-                Serial.println("Connected to peripheral");
-
-                if (peripheral.discoverAttributes()) {
-                    Serial.println("Attributes discovered");
-
-                    BLECharacteristic ssidCharacteristic = peripheral.characteristic(SSID_UUID);
-                    BLECharacteristic passwordCharacteristic = peripheral.characteristic(PASSWORD_UUID);
-                    BLECharacteristic clientKeyCharacteristic = peripheral.characteristic(CLIENTKEY_UUID);
-                    BLECharacteristic clientNameCharacteristic = peripheral.characteristic(CLIENTNAME_UUID);
-
-                    if (ssidCharacteristic.canWrite()) {
-                        ssidCharacteristic.writeValue(ssid.c_str());
-                        Serial.println("SSID written");
-                    }
-
-                    if (passwordCharacteristic.canWrite()) {
-                        passwordCharacteristic.writeValue(password.c_str());
-                        Serial.println("Password written");
-                    }
-
-                    if (clientKeyCharacteristic.canWrite()) {
-                        clientKeyCharacteristic.writeValue(clientKey.c_str());
-                        Serial.println("Client Key written");
-                    }
-
-                    if (clientNameCharacteristic.canWrite()) {
-                        clientNameCharacteristic.writeValue(clientName.c_str());
-                        Serial.println("Client Name written");
-                    }
-                }
-
-                peripheral.disconnect();
-                Serial.println("Disconnected from peripheral");
-            } else {
-                Serial.println("Failed to connect to peripheral");
-            }
-
-            BLE.scan();
+        if (peripheral.connect()) {
+            Serial.println("Connected to peripheral");
+        } else {
+            Serial.println("Failed to connect to peripheral");
+            return;
         }
+
+        if (peripheral.discoverService(SERVICE_UUID)) {
+            Serial.println("Service discovered");
+
+            BLECharacteristic ssidCharacteristic = peripheral.characteristic(SSID_UUID);
+            BLECharacteristic passwordCharacteristic = peripheral.characteristic(PASSWORD_UUID);
+            BLECharacteristic clientKeyCharacteristic = peripheral.characteristic(CLIENTKEY_UUID);
+            BLECharacteristic clientNameCharacteristic = peripheral.characteristic(CLIENTNAME_UUID);
+
+            if (ssidCharacteristic && passwordCharacteristic && clientKeyCharacteristic && clientNameCharacteristic) {
+                Serial.println("Characteristics discovered");
+
+                ssidCharacteristic.writeValue(ssid.c_str(), ssid.length());
+                passwordCharacteristic.writeValue(password.c_str(), password.length());
+                clientKeyCharacteristic.writeValue(clientKey.c_str(), clientKey.length());
+                clientNameCharacteristic.writeValue(clientName.c_str(), clientName.length());
+
+                Serial.println("Characteristics written");
+            } else {
+                Serial.println("Failed to discover characteristics");
+            }
+        } else {
+            Serial.println("Failed to discover service");
+        }
+
+        peripheral.disconnect();
+        Serial.println("Disconnected from peripheral");
     }
 }
-
