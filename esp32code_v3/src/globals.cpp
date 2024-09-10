@@ -30,21 +30,24 @@ String serverPort = "3000";
 
 //Setting up the endpoints for posting machine data
 String clientName = "lafayette.edu";
+//A secret key which is different for each SpaceOna client (used for authentication)
+//We might want an initial key so the board can connect to the backend and then get the correct client key
+String clientKey = "test";
+
+
+//TODO old and might be removed
 String building = "watsonhall";
 String type = "washer";
 String id = "0";
 
 
-//A secret key which is different for each SpaceOna client (used for authentication)
-//We might want an initial key so the board can connect to the backend and then get the correct client key
-String clientKey = "test";
 
 String jwt = "";
 boolean authenticated = false;
 
 // Setting up the wifi details
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
+String ssid = WIFI_SSID;
+String password = WIFI_PASSWORD;
 String mac_address;
 
 // Setting up the LEDs

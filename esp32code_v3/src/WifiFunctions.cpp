@@ -169,6 +169,7 @@ boolean serverAuth(){
 
 HTTPClient statusClient;
 
+
 void machineStatusUpdate(boolean currentMachineStatus){
     //Setting up the endpoint
     endpoint = "/update/" + clientName + "/" + building + "/" + type + "/" + id;
