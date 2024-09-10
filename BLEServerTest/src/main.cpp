@@ -55,6 +55,18 @@ void setup(){
 }
 
 void loop() {
-    // put your main code here, to run repeatedly:
-    delay(2000);
+    // check if a peripheral has been discovered
+    BLEDevice peripheral = BLE.available();
+
+    if (peripheral) {
+        // discovered a peripheral, print out address, local name, and advertised service
+        Serial.print("Found ");
+        Serial.print(peripheral.address());
+        Serial.print(" '");
+        Serial.print(peripheral.localName());
+        Serial.print("' ");
+        Serial.print(peripheral.advertisedServiceUuid());
+        Serial.println();
+    }
+
 }
