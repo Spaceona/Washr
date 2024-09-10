@@ -76,25 +76,37 @@ void loop() {
 }
 
 void onSSIDWritten(BLEDevice central, BLECharacteristic characteristic) {
-    ssid = String((char*)characteristic.value());
+    char buffer[32];
+    int length = characteristic.readValue(buffer, sizeof(buffer) - 1);
+    buffer[length] = '\0'; // Ensure null-termination
+    ssid = String(buffer);
     Serial.print("SSID updated to: ");
     Serial.println(ssid);
 }
 
 void onPasswordWritten(BLEDevice central, BLECharacteristic characteristic) {
-    password = String((char*)characteristic.value());
+    char buffer[32];
+    int length = characteristic.readValue(buffer, sizeof(buffer) - 1);
+    buffer[length] = '\0'; // Ensure null-termination
+    password = String(buffer);
     Serial.print("Password updated to: ");
     Serial.println(password);
 }
 
 void onClientKeyWritten(BLEDevice central, BLECharacteristic characteristic) {
-    clientKey = String((char*)characteristic.value());
+    char buffer[32];
+    int length = characteristic.readValue(buffer, sizeof(buffer) - 1);
+    buffer[length] = '\0'; // Ensure null-termination
+    clientKey = String(buffer);
     Serial.print("Client Key updated to: ");
     Serial.println(clientKey);
 }
 
 void onClientNameWritten(BLEDevice central, BLECharacteristic characteristic) {
-    clientName = String((char*)characteristic.value());
+    char buffer[32];
+    int length = characteristic.readValue(buffer, sizeof(buffer) - 1);
+    buffer[length] = '\0'; // Ensure null-termination
+    clientName = String(buffer);
     Serial.print("Client Name updated to: ");
     Serial.println(clientName);
 }
