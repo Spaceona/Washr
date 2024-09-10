@@ -2,7 +2,6 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-#include <ArduinoBLE.h>
 
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
@@ -13,13 +12,14 @@
 #define PASSWORD_UUID "05a4ce96-6214-4216-9986-ba51a47c0853"
 #define CLIENTKEY_UUID "592e1d83-70a4-4c3e-8917-dcd2c63985fb"
 //#define AUTH_UUID "4b1dcf29-6c1d-498b-844b-4169bace5de0"
-#define SECRET_UUID "27ea72f0-6f5a-4274-9220-80dcb1778570"
+#define CLIENTNAME_UUID "27ea72f0-6f5a-4274-9220-80dcb1778570"
 
 
 
 String ssid = "ESPDevNetwork";
 String password = "password";
-String key = "spaceona";
+String clientKey = "testkey";
+String clientName = "test2";
 
 
 class MyCallbacks : public BLECharacteristicCallbacks {
@@ -63,8 +63,8 @@ public:
 
             } else if (uuid == CLIENTKEY_UUID) {
 
-            } else if (uuid == SECRET_UUID) {
-                Serial.println("Secret: " + value);
+            } else if (uuid == CLIENTNAME_UUID) {
+
             }
         }
     }
@@ -118,7 +118,7 @@ void setup() {
     BLEDescriptor *ssidDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x2901));
     ssidDescriptor->setValue("SSID");
     ssidCharacteristic->addDescriptor(ssidDescriptor);
-    ssidCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
+    //ssidCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
 
     //Setting up the characteristic for the password
     BLECharacteristic *passwordCharacteristic = pService->createCharacteristic(
@@ -132,21 +132,35 @@ void setup() {
     BLEDescriptor *passwordDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x2901));
     passwordDescriptor->setValue("Password");
     passwordCharacteristic->addDescriptor(passwordDescriptor);
-    passwordCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
+    //passwordCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
 
-    //Setting up the characteristic for the client key
+    //Setting up the characteristic for the client clientKey
     BLECharacteristic *keyCharacteristic = pService->createCharacteristic(
             CLIENTKEY_UUID,
             BLECharacteristic::PROPERTY_READ
     );
     keyCharacteristic->setCallbacks(new WiFiCallbacks(CLIENTKEY_UUID));
-    keyCharacteristic->setValue(key.c_str());
+    keyCharacteristic->setValue(clientKey.c_str());
 
-    //Descriptor for the key characteristic (so it says "Client Key" in an app)
+    //Descriptor for the clientKey characteristic (so it says "Client Key" in an app)
     BLEDescriptor *keyDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x2901));
     keyDescriptor->setValue("Client Key");
     keyCharacteristic->addDescriptor(keyDescriptor);
-    keyCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
+    //keyCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
+
+    //Setting up the characteristic for the client clientname
+    BLECharacteristic *nameCharacteristic = pService->createCharacteristic(
+            CLIENTNAME_UUID,
+            BLECharacteristic::PROPERTY_READ
+    );
+    nameCharacteristic->setCallbacks(new WiFiCallbacks(CLIENTNAME_UUID));
+    nameCharacteristic->setValue(clientName.c_str());
+
+    //Descriptor for the clientKey characteristic (so it says "Client Key" in an app)
+    BLEDescriptor *nameDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x2901));
+    nameDescriptor->setValue("Client Name");
+    nameCharacteristic->addDescriptor(nameDescriptor);
+    //nameCharacteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
 
     //Starting the server and advertising it
     pService->start();
