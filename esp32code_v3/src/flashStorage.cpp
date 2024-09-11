@@ -18,6 +18,7 @@ boolean flashStorageInit(){
         flashStorage.end();
         flashStorage.begin("creds", false, "nvs");
         flashStorage.putBool("hasCreds", false);
+        flashStorage.putBool("onboarded", false);
         flashStorage.putString("ssid", "");
         flashStorage.putString("password", "");
         flashStorage.putBool("nvsInit", true);
@@ -49,6 +50,33 @@ boolean setHasWifiCredentials(boolean hasCredentials) {
     }
 
     flashStorage.putBool("hasCreds", hasCredentials);
+    flashStorage.end();
+    return true;
+}
+
+boolean beenOnboarded() {
+    flashStorage.end();
+    flashStorage.begin("creds", true, "nvs");
+
+    if(flashStorage.getBool("nvsInit", false) == false){
+        return false;
+    }
+
+    boolean beenOnboarded =  flashStorage.getBool("onboarded", false);
+    Serial.println("Has credentials: " + String(beenOnboarded));
+    flashStorage.end();
+    return beenOnboarded;
+}
+
+boolean setOnboarded(boolean onboarded) {
+    flashStorage.end();
+    flashStorage.begin("creds", false, "nvs");
+
+    if(flashStorage.getBool("nvsInit", false) == false){
+        return false;
+    }
+
+    flashStorage.putBool("onboarded", onboarded);
     flashStorage.end();
     return true;
 }

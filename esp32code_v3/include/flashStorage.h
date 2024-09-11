@@ -16,6 +16,10 @@ boolean hasWifiCredentials();
 
 boolean setHasWifiCredentials(boolean hasCredentials);
 
+boolean beenOnboarded();
+
+boolean setOnboarded(boolean onboarded);
+
 boolean setWifiCredentials(String newSsid, String newPassword);
 
 String getWifiSsid();

@@ -4,6 +4,7 @@
 
 #include <Arduino.h>
 #include <ArduinoBLE.h>
+#include "flashStorage.h"
 #include "globals.h"
 
 #define SERVICE_UUID        "26efde6e-344c-47a4-bf50-78d548220c87"
@@ -11,6 +12,8 @@
 #define PASSWORD_UUID       "05a4ce96-6214-4216-9986-ba51a47c0853"
 #define CLIENTKEY_UUID      "592e1d83-70a4-4c3e-8917-dcd2c63985fb"
 #define CLIENTNAME_UUID     "27ea72f0-6f5a-4274-9220-80dcb1778570"
+
+boolean credentialsRecieved = false;
 
 BLEService wifiService(SERVICE_UUID);
 BLECharacteristic ssidCharacteristic(SSID_UUID, BLEWrite, 32);
@@ -57,7 +60,58 @@ void bluetoothInit(){
 }
 
 void bluetoothScan(){
-    while(!){
+    while(!credentialsRecieved){
+        BLEDevice central = BLE.central();
 
+        //Serial.println("Waiting to connect");
+
+        if (central.connected()) {
+            Serial.print("Connected to central: ");
+            Serial.println(String(central.address()));
+
+            while (central.connected()) {
+                // Do nothing, just wait for the central to disconnect
+            }
+
+            Serial.print("Disconnected from central: ");
+            Serial.println(String(central.address()));
+        }
     }
+}
+
+void onSSIDWritten(BLEDevice central, BLECharacteristic characteristic) {
+    char buffer[32];
+    int length = characteristic.readValue(buffer, sizeof(buffer) - 1);
+    buffer[length] = '\0'; // Ensure null-termination
+    ssid = String(buffer);
+    Serial.print("SSID updated to: ");
+    Serial.println(ssid);
+}
+
+void onPasswordWritten(BLEDevice central, BLECharacteristic characteristic) {
+    char buffer[32];
+    int length = characteristic.readValue(buffer, sizeof(buffer) - 1);
+    buffer[length] = '\0'; // Ensure null-termination
+    password = String(buffer);
+    Serial.print("Password updated to: ");
+    Serial.println(password);
+}
+
+void onClientKeyWritten(BLEDevice central, BLECharacteristic characteristic) {
+    char buffer[32];
+    int length = characteristic.readValue(buffer, sizeof(buffer) - 1);
+    buffer[length] = '\0'; // Ensure null-termination
+    clientKey = String(buffer);
+    Serial.print("Client Key updated to: ");
+    Serial.println(clientKey);
+}
+
+void onClientNameWritten(BLEDevice central, BLECharacteristic characteristic) {
+    char buffer[32];
+    int length = characteristic.readValue(buffer, sizeof(buffer) - 1);
+    buffer[length] = '\0'; // Ensure null-termination
+    clientName = String(buffer);
+    Serial.print("Client Name updated to: ");
+    Serial.println(clientName);
+    credentialsRecieved = true;
 }
