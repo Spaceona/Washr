@@ -127,7 +127,7 @@ int serverAuth(){
     auth_server = server_name + endpoint;
     //Serial.println("Auth server: " + auth_server);
     //Serial.println("Starting HTTPS connection...");
-    if (!authClient.begin(testClient, auth_server)) {
+    if (!authClient.begin(client, auth_server)) {
         Serial.println("Failed to start HTTPS connection");
         return false;
     }
@@ -200,7 +200,7 @@ int machineStatusUpdate(boolean currentMachineStatus){
 
     //Testing server connection
     Serial.println("Starting HTTPS connection...");
-    if (!statusClient.begin(testClient, statusServer)) {
+    if (!statusClient.begin(client, statusServer)) {
         Serial.println("Failed to start HTTPS connection");
         statusClient.end();
         return -1;
@@ -228,7 +228,7 @@ int machineStatusUpdate(boolean currentMachineStatus){
     Serial.print("Status HTTP Code: ");
     Serial.println(httpCode);
     String responseBody = statusClient.getString();
-    //Serial.println("Response body: " + responseBody);
+    Serial.println("Response body: " + responseBody);
     statusClient.end();
     if(httpCode > 0){
         if(httpCode == 200){
@@ -262,11 +262,11 @@ int onboardBoard(){
     //Setting up the endpoint
     endpoint = "/onboard/board";
     String onboardServer = server_name + endpoint;
-    //Serial.println("Onboard server: " + onboardServer);
+    Serial.println("Onboard server: " + onboardServer);
 
     //Testing server connection
     Serial.println("Starting HTTPS connection...");
-    if (!statusClient.begin(testClient, onboardServer)) {
+    if (!statusClient.begin(client, onboardServer)) {
         Serial.println("Failed to start HTTPS connection");
         statusClient.end();
         return -1;
@@ -334,7 +334,7 @@ void otaUpdate(String updateFirmware) {
     String firmwareServer = server_name + firmwareEndpoint;
 
     Serial.println("Firmware server: " + firmwareServer);
-    t_httpUpdate_return ret = httpUpdate.update(testClient,  firmwareServer, requestCallback);
+    t_httpUpdate_return ret = httpUpdate.update(client,  firmwareServer, requestCallback);
 
     switch (ret) {
     case HTTP_UPDATE_FAILED:
@@ -433,7 +433,7 @@ String latestFirmware(){
 
     //Testing server connection
     Serial.println("Starting HTTPS connection...");
-    if (!firmwareClient.begin(testClient, firmwareServer)) {
+    if (!firmwareClient.begin(client, firmwareServer)) {
         Serial.println("Failed to start HTTPS connection");
         firmwareClient.end();
         return "error";
@@ -500,7 +500,7 @@ time_t heartbeatUpdateTime(int minutePeriod) {
     tmElements_t tm;
     breakTime(now, tm);
 
-    // Add 15 minutes to the current time
+    // Add minutePeriod minutes to the current time
     tm.Minute += minutePeriod;
 
     // Handle overflow of minutes

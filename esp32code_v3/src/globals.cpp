@@ -26,15 +26,15 @@ String timezone_name = "America/New_York";
 WiFiClientSecure client;
 
 //TODO change this to the backend server when backend changes are merged
-String server_name = "http://139.147.84.119:3001";
+String server_name = "https://api.spaceona.com";
 String endpoint = "";
 String serverPort = "3001";
 
 
 //A secret key which is different for each SpaceOna client (used for authentication)
 //We might want an initial key so the board can connect to the backend and then get the correct client key
-String clientKey = "fjdslka";
-String clientName = "Lafayette";
+String clientKey = "_rQ8te)YMMMIqLGd7NaV7W_D^";
+String clientName = "test3";
 
 boolean setupComplete = false;
 
@@ -47,7 +47,7 @@ String password = "";
 String mac_address;
 
 //Setting up the parameterized versions of timing variables
-int heartbeatPeriod = 5;
+int heartbeatPeriod = 1;
 
 // Setting up the LEDs
 int led_1 = D3;
