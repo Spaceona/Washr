@@ -44,7 +44,7 @@ String password = "";
 String mac_address;
 
 //Setting up the parameterized versions of timing variables
-int heartbeatPeriod = 5;
+int heartbeatPeriod = 1;
 
 // Setting up the LEDs
 int led_1 = D3;

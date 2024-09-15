@@ -124,7 +124,7 @@ void tickFunction() {
 
             //Setting up the time to check for firmware updates (also sets up the clock)
             time_t firmwareTime = firmwareUpdateTime();
-            time_t heartbeatTime = heartbeatUpdateTime();
+            time_t heartbeatTime = heartbeatUpdateTime(heartbeatPeriod);
 
             //Setting up the firmware check event
             myTimezone.setEvent(firmwareCheck, firmwareTime);
