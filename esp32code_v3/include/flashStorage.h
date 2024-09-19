@@ -22,6 +22,8 @@ String getWifiPassword();
 
 void clearWifiCredentials();
 
+boolean setSetupComplete(boolean setupComplete);
 
+boolean isSetupComplete();
 
 #endif //ESP32CODE_V3_FLASHSTORAGE_H

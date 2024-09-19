@@ -8,7 +8,7 @@
 
 
 //Initializes the wifi
-void wifi_init(String server_name, HTTPClient& https);
+boolean wifi_init(String server_name, HTTPClient& https);
 
 void wifiConnect();
 
@@ -18,6 +18,8 @@ int machineStatusUpdate(boolean currentMachineStatus);
 
 //Used to check a webserver for a new firmware version (WIP)
 void otaUpdate(String updateFirmware);
+
+int onboardBoard();
 
 void requestCallback(HTTPClient* callbackClient);
 

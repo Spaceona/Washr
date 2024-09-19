@@ -40,17 +40,31 @@ const char* test_root_ca =
     "-----END CERTIFICATE-----\n";
 
 
-void wifi_init(String server_name, HTTPClient& https) {
+boolean wifi_init(String server_name, HTTPClient& https) {
     // Setting up the wifi
     WiFi.mode(WIFI_STA); // Optional
     WiFi.begin(ssid, password);
     Serial.println("\nConnecting");
 
+    //TODO add a timeout for the wifi connection
+
+    // Define a timeout period (e.g., 10 seconds)
+    //const unsigned long wifiTimeout = 1000 * 60 * 5; // 5 minutes
+    const unsigned long wifiTimeout = 30000;
+
+// Record the start time
+    unsigned long startTime = millis();
+
     while (WiFi.status() != WL_CONNECTED) {
+        // Check if the timeout period has been exceeded
+        if (millis() - startTime >= wifiTimeout) {
+            Serial.println("WiFi connection timed out");
+            // Handle the timeout case (e.g., reset the device, retry, etc.)
+            return false;
+        }
         Serial.print(".");
         delay(100);
     }
-    Serial.println("");
 
     Serial.println("\nConnected to the WiFi network");
 
@@ -80,11 +94,13 @@ void wifi_init(String server_name, HTTPClient& https) {
     //Serial.println("Testing certificate and connection to server");
     if (!client.connect("10.1.1.194", 3001)) {
         Serial.println("Connection failed");
-        return;
+        //TODO change this later when it becomes a problem
+        return true;
     }
     else {
         Serial.println("Connection successful");
     }
+    return true;
 }
 
 void wifiConnect(){
@@ -111,7 +127,7 @@ int serverAuth(){
     auth_server = server_name + endpoint;
     //Serial.println("Auth server: " + auth_server);
     //Serial.println("Starting HTTPS connection...");
-    if (!authClient.begin(testClient, auth_server)) {
+    if (!authClient.begin(client, auth_server)) {
         Serial.println("Failed to start HTTPS connection");
         return false;
     }
@@ -184,7 +200,7 @@ int machineStatusUpdate(boolean currentMachineStatus){
 
     //Testing server connection
     Serial.println("Starting HTTPS connection...");
-    if (!statusClient.begin(testClient, statusServer)) {
+    if (!statusClient.begin(client, statusServer)) {
         Serial.println("Failed to start HTTPS connection");
         statusClient.end();
         return -1;
@@ -212,7 +228,7 @@ int machineStatusUpdate(boolean currentMachineStatus){
     Serial.print("Status HTTP Code: ");
     Serial.println(httpCode);
     String responseBody = statusClient.getString();
-    //Serial.println("Response body: " + responseBody);
+    Serial.println("Response body: " + responseBody);
     statusClient.end();
     if(httpCode > 0){
         if(httpCode == 200){
@@ -239,6 +255,77 @@ int machineStatusUpdate(boolean currentMachineStatus){
     return -1;
 }
 
+
+//TODO swap the testclient to just one client
+int onboardBoard(){
+    Serial.println("Onboarding board");
+    //Setting up the endpoint
+    endpoint = "/onboard/board";
+    String onboardServer = server_name + endpoint;
+    Serial.println("Onboard server: " + onboardServer);
+
+    //Testing server connection
+    Serial.println("Starting HTTPS connection...");
+    if (!statusClient.begin(client, onboardServer)) {
+        Serial.println("Failed to start HTTPS connection");
+        statusClient.end();
+        return -1;
+    }
+
+    //Setting up the data
+    JsonDocument onboardData;
+    onboardData["mac_address"] = mac_address;
+    onboardData["client_name"] = clientName;
+    onboardData["client_key"] = clientKey;
+    String onboardDataString;
+    serializeJson(onboardData, onboardDataString);
+    Serial.println("Data to be sent: " + onboardDataString);
+    //Adding headers
+    //TODO check the headers
+
+    //Posting
+    int httpCode = statusClient.POST(onboardDataString);
+
+    Serial.print("Status HTTP Code: ");
+    Serial.println(httpCode);
+    String responseBody = statusClient.getString();
+    //Serial.println("Response body: " + responseBody);
+    statusClient.end();
+    if(httpCode > 0){
+        if(httpCode == 200){
+            Serial.println("Onboarded board correctly");
+            digitalWrite(led_2, HIGH);
+            delay(100);
+            digitalWrite(led_2, LOW);
+            setupComplete = true;
+            setSetupComplete(setupComplete);
+        }
+        else if (httpCode == 401){
+            Serial.println("Unauthorized");
+            setupComplete = false;
+            setSetupComplete(setupComplete);
+        } else if(httpCode == 400){
+            Serial.println("Bad request");
+            setupComplete = false;
+            setSetupComplete(setupComplete);
+        } else if(httpCode == 500){
+            Serial.println("Internal server error");
+            setupComplete = false;
+            setSetupComplete(setupComplete);
+        } else {
+            Serial.println("Failed to update machine status: Unknown error");
+            setupComplete = false;
+            setSetupComplete(setupComplete);
+        }
+        return httpCode;
+    } else {
+        Serial.println("Error on HTTP request");
+    }
+    setupComplete = false;
+    setSetupComplete(setupComplete);
+    return -1;
+}
+
 //TODO change this to a secure connection when it is implemented on the server
 void otaUpdate(String updateFirmware) {
     Serial.println("Starting OTA update check");
@@ -247,7 +334,7 @@ void otaUpdate(String updateFirmware) {
     String firmwareServer = server_name + firmwareEndpoint;
 
     Serial.println("Firmware server: " + firmwareServer);
-    t_httpUpdate_return ret = httpUpdate.update(testClient,  firmwareServer, requestCallback);
+    t_httpUpdate_return ret = httpUpdate.update(client,  firmwareServer, requestCallback);
 
     switch (ret) {
     case HTTP_UPDATE_FAILED:
@@ -284,6 +371,7 @@ void setClock() {
 }
 
 //Returns 7pm the next day
+//TODO change this to have it be a parameter
 time_t firmwareUpdateTime() {
     setClock();
     time_t now = myTimezone.now();
@@ -345,7 +433,7 @@ String latestFirmware(){
 
     //Testing server connection
     Serial.println("Starting HTTPS connection...");
-    if (!firmwareClient.begin(testClient, firmwareServer)) {
+    if (!firmwareClient.begin(client, firmwareServer)) {
         Serial.println("Failed to start HTTPS connection");
         firmwareClient.end();
         return "error";
@@ -405,14 +493,14 @@ String latestFirmware(){
     }
 }
 
-//Returns 15 minutes from current time
+//Returns X minutes from current time
 time_t heartbeatUpdateTime(int minutePeriod) {
     time_t now = myTimezone.now();
 
     tmElements_t tm;
     breakTime(now, tm);
 
-    // Add 15 minutes to the current time
+    // Add minutePeriod minutes to the current time
     tm.Minute += minutePeriod;
 
     // Handle overflow of minutes

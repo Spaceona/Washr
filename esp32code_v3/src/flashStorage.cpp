@@ -97,3 +97,19 @@ void clearWifiCredentials() {
     flashStorage.putBool("hasCreds", false);
     flashStorage.end();
 }
+
+boolean setSetupComplete(boolean setupComplete) {
+    flashStorage.end();
+    flashStorage.begin("creds", false, "nvs");
+    flashStorage.putBool("setupComplete", setupComplete);
+    flashStorage.end();
+    return true;
+}
+
+boolean isSetupComplete() {
+    flashStorage.end();
+    flashStorage.begin("creds", true, "nvs");
+    boolean setupComplete = flashStorage.getBool("setupComplete", false);
+    flashStorage.end();
+    return setupComplete;
+}

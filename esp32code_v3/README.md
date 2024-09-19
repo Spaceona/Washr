@@ -25,7 +25,7 @@ TODO
 TODO
 
 ### Firmware Update
-Please make sure to change the firmware version in the globals.cpp file before commiting to the repository.
+Please make sure to change the firmware version in the globals.cpp file before creating a pull request.
 Once the code has been merged please make sure to build the firmware, rename it to the correct version, and commit it to the spaceona-db repository in the correct folder.
 
 ### WiFi Configuration
