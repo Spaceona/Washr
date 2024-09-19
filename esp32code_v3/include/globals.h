@@ -26,10 +26,13 @@ extern WiFiClientSecure client;
 
 extern String clientName;
 extern String clientKey;
+extern String clientName;
 
 extern String server_name;
 extern String endpoint;
 extern String serverPort;
+
+extern boolean setupComplete;
 
 extern String jwt;
 extern boolean authenticated;

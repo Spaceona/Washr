@@ -13,7 +13,7 @@
 #include "globals.h"
 
 //Firmware version
-String FIRMWARE_VERSION = "1-2-1";
+String FIRMWARE_VERSION = "1-3-0";
 const int FIRMWARE_VERSION_MAJOR = FIRMWARE_VERSION.substring(0, 1).toInt();
 const int FIRMWARE_VERSION_MINOR = FIRMWARE_VERSION.substring(2, 3).toInt();
 const int FIRMWARE_VERSION_PATCH = FIRMWARE_VERSION.substring(4, 5).toInt();
@@ -26,14 +26,17 @@ String timezone_name = "America/New_York";
 WiFiClientSecure client;
 
 //TODO change this to the backend server when backend changes are merged
-String server_name = "http://10.1.1.194:3001";
+String server_name = "https://api.spaceona.com";
 String endpoint = "";
 String serverPort = "3001";
 
 String clientName = "test";
 //A secret key which is different for each SpaceOna client (used for authentication)
 //We might want an initial key so the board can connect to the backend and then get the correct client key
-String clientKey = "test";
+String clientKey = "S1@zQvxf(@JATjXR3r5hHAgwq";
+String clientName = "test3";
+
+boolean setupComplete = false;
 
 String jwt = "";
 boolean authenticated = false;
@@ -44,7 +47,7 @@ String password = "";
 String mac_address;
 
 //Setting up the parameterized versions of timing variables
-int heartbeatPeriod = 5;
+int heartbeatPeriod = 1;
 
 // Setting up the LEDs
 int led_1 = D3;
