@@ -1,6 +1,5 @@
-//
-// Created by leslier on 8/3/2024.
-//
+// Created by Robbie Leslie
+// Modified by
 
 #include <Arduino.h>
 #include <WiFi.h>
@@ -30,7 +29,7 @@ String server_name = "https://api.spaceona.com";
 String endpoint = "";
 String serverPort = "3001";
 
-String clientName = "test";
+
 //A secret key which is different for each SpaceOna client (used for authentication)
 //We might want an initial key so the board can connect to the backend and then get the correct client key
 String clientKey = "S1@zQvxf(@JATjXR3r5hHAgwq";

@@ -1,6 +1,5 @@
-//
-// Created by leslier on 8/17/2024.
-//
+// Created by Robbie Leslie
+// Modified by
 
 #ifndef ESP32CODE_V3_FLASHSTORAGE_H
 #define ESP32CODE_V3_FLASHSTORAGE_H
@@ -9,6 +8,10 @@
 
 
 boolean flashStorageInit();
+
+void eraseFlashStorage();
+
+void printFlashStorage();
 
 boolean hasWifiCredentials();
 

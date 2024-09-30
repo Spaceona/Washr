@@ -1,6 +1,5 @@
-//
-// Created by leslier on 8/17/2024.
-//
+// Created by Robbie Leslie
+// Modified by
 
 #include <Arduino.h>
 #include <preferences.h>
@@ -27,15 +26,36 @@ boolean flashStorageInit(){
     return true;
 }
 
+void eraseFlashStorage(){
+    flashStorage.end();
+    flashStorage.begin("creds", false, "nvs");
+    flashStorage.clear();
+    flashStorage.end();
+    Serial.println("Flash storage erased");
+}
+
+void printFlashStorage(){
+    flashStorage.end();
+    flashStorage.begin("creds", true, "nvs");
+    Serial.println("SSID: " + flashStorage.getString("ssid", ""));
+    Serial.println("Password: " + flashStorage.getString("password", ""));
+    Serial.println("Has credentials: " + String(flashStorage.getBool("hasCreds", false)));
+    Serial.println("Onboarded: " + String(flashStorage.getBool("onboarded", false)));
+    Serial.println("Setup complete: " + String(flashStorage.getBool("setupComplete", false)));
+    flashStorage.end();
+}
+
 boolean hasWifiCredentials() {
     flashStorage.end();
     flashStorage.begin("creds", true, "nvs");
 
-    if(flashStorage.getBool("nvsInit", false) == false){
+    // Check if the flash storage was properly initialized
+    if (!flashStorage.isKey("nvsInit") || flashStorage.getBool("nvsInit", false) == false) {
+        flashStorage.end();
         return false;
     }
 
-    boolean hasCredentials =  flashStorage.getBool("hasCreds", false);
+    boolean hasCredentials = flashStorage.getBool("hasCreds", false);
     Serial.println("Has credentials: " + String(hasCredentials));
     flashStorage.end();
     return hasCredentials;
@@ -45,7 +65,9 @@ boolean setHasWifiCredentials(boolean hasCredentials) {
     flashStorage.end();
     flashStorage.begin("creds", false, "nvs");
 
-    if(flashStorage.getBool("nvsInit", false) == false){
+    // Check if the flash storage was properly initialized
+    if (!flashStorage.isKey("nvsInit") || flashStorage.getBool("nvsInit", false) == false) {
+        flashStorage.end();
         return false;
     }
 
@@ -63,7 +85,7 @@ boolean beenOnboarded() {
     }
 
     boolean beenOnboarded =  flashStorage.getBool("onboarded", false);
-    Serial.println("Has credentials: " + String(beenOnboarded));
+    Serial.println("Been onboarded: " + String(beenOnboarded));
     flashStorage.end();
     return beenOnboarded;
 }

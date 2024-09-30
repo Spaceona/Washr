@@ -1,3 +1,6 @@
+// Created by Robbie Leslie
+// Modified by
+
 #ifndef TICK_FUNCTION_H
 #define TICK_FUNCTION_H
 

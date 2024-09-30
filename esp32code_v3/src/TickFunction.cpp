@@ -1,3 +1,6 @@
+// Created by Robbie Leslie
+// Modified by
+
 #include <Arduino.h>
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
@@ -10,6 +13,7 @@
 #include "WifiFunctions.h"
 #include "MPUFunctions.h"
 #include "flashStorage.h"
+#include "bluetoothFunctions.h"
 
 
 // Setting up the https client for making HTTPS requests
@@ -31,6 +35,7 @@ int previousHttpCode;
 int setupTries = 0;
 int setupThreshold = 8; //Can change this depend on how fast the tick function is running
 boolean setupFailed = false;
+boolean bluetoothFinished = false;
 
 // Setting up the tick function
 void tickFunction() {
@@ -53,10 +58,41 @@ void tickFunction() {
             //TODO have this only do the client credentials if the wifi setup was good
             //TODO have this only do the wifi credentials if the boards has already been onboarded
             Serial.println("Getting Credentials");
-            if(!hasWifiCredentials()){
+
+            boolean hasCreds = hasWifiCredentials();
+
+            if(!hasCreds){
                 //TODO change this once we have the bluetooth setup
-                ssid = getWifiSsid();
-                password = getWifiPassword();
+
+                Serial.println("Getting Wifi Credentials using bluetooth");
+
+                bluetoothInit();
+
+                BLEDevice central = BLE.central();
+
+                //Serial.println("Waiting to connect");
+
+                while(!bluetoothFinished){
+                    if (central.connected()) {
+                        Serial.print("Connected to central: ");
+                        Serial.println(String(central.address()));
+
+                        /*
+                        while (central.connected()) {
+                            // Do nothing, just wait for the central to disconnect
+                        }
+                         */
+
+                        //Serial.print("Disconnected from central: ");
+                        //Serial.println(String(central.address()));
+                        bluetoothFinished = true;
+                    }
+                }
+                Serial.println("Bluetooth finished");
+
+
+                //TODO Need to write the credentials to flash storage
+
             } else {
                 ssid = getWifiSsid();
                 password = getWifiPassword();

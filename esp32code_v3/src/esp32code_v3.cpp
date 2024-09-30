@@ -1,5 +1,8 @@
 // SpaceOna Washr ESP32 code V1
 
+// Created by Robbie Leslie
+// Modified by
+
 // Imports
 #include <Arduino.h>
 #include <Adafruit_MPU6050.h>
@@ -27,6 +30,7 @@ void setup() {
     Serial.begin(115200);
     delay(1000);
 
+
     // Setting up the Serial1 for debugging
     //Serial1.begin(115200, SERIAL_8N1, D7, D6);
 
@@ -39,11 +43,15 @@ void setup() {
 
     flashStorageInit();
 
+    //setHasWifiCredentials(false);
+
+    printFlashStorage();
+
     //Initializing MPU
     mpu_init(mpu, MPU6050_RANGE_2_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
 
     //setting the wifi credentials for testing
-    setWifiCredentials(WIFI_SSID, WIFI_PASSWORD);
+    //setWifiCredentials(WIFI_SSID, WIFI_PASSWORD);
 
 }
 
