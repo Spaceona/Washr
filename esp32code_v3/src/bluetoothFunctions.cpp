@@ -1,6 +1,8 @@
 // Created by Robbie Leslie
 // Modified by
 
+//TODO rewrite this using the Nimble library
+
 #include <Arduino.h>
 #include <ArduinoBLE.h>
 #include "globals.h"
@@ -23,6 +25,11 @@ void bluetoothInit(){
         Serial.println("starting BLE failed!");
         while (1);
     }
+
+    //Making sure that the WiFi is off
+    WiFi.disconnect(true); // Disconnect from any connected WiFi network
+    WiFi.mode(WIFI_OFF);   // Turn off the WiFi module
+    Serial.println("WiFi disabled");
 
     BLE.setLocalName("Washr");
     BLE.setAdvertisedService(wifiService);
@@ -52,8 +59,10 @@ void bluetoothInit(){
 }
 
 void bluetoothShutdown() {
+    BLE.setEventHandler(BLEDisconnected, nullptr); // Remove the disconnect event handler
+    BLE.disconnect(); // Disconnect from any connected central
     BLE.stopAdvertise(); // Stop advertising
-    //BLE.end(); // Shut down BLE
+    BLE.end(); // Shut down BLE
     Serial.println("BLE Peripheral - Shutdown");
 }
 
@@ -97,7 +106,6 @@ void onCentralDisconnected(BLEDevice central) {
     //Serial.print("Disconnected from central: ");
     //Serial.println(central.address());
     Serial.println("Central disconnected");
-    delay(5000); // Delay to ensure the central has time to disconnect
     Serial.println("Shutting down BLE");
     bluetoothShutdown(); // Call the shutdown function or any other cleanup code
 }

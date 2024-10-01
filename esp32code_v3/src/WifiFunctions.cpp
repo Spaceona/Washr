@@ -45,7 +45,7 @@ const char* test_root_ca =
 
 boolean wifi_init(String server_name, HTTPClient& https) {
     // Setting up the wifi
-    WiFi.mode(WIFI_STA); // Optional
+    WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
     Serial.println("\nConnecting");
 
