@@ -1,7 +1,7 @@
 
 
 # About
-This is the second version of the SpaceOna code for an ESP32, more specifically the Seeed Studio ESP32C3.
+This is the second version of the SpaceOna code for an ESP32. It currently supports both the Seeed Studio board and the custom Washr board.
 It updated the code architecture to use c++ files to break the functions into separate files to make the code more readable.
 It also updated the code to use the PlatformIO IDE instead of the Arduino IDE.
 
@@ -17,16 +17,18 @@ It also updated the code to use the PlatformIO IDE instead of the Arduino IDE.
 7. Open the serial monitor to view the output of the ESP32C3 board. (If using Clion, don't use the upload and monitor button, instead use the Clion Serial Monitor Plugin)
 8. Make changes to the code and test them on the ESP32C3 board.
 9. If you are going to add new libraries to the project, add them to the `platformio.ini` file.
+10. Make sure that you develop your changes in a seperate branch in Git
 
 ### Code Style
 TODO
 
+Make sure that any changes which are specific to a board are inside a #ifdef block.
+
 ### Pull Request Guidelines
-TODO
+Please write a brief decription of what your code changed, and why you made those changes. Set yourself as the assignee, and assign Robbie (leslier7) as the reviewer. Do not merge your code until Robbie has reviewed it and given approval.
 
 ### Firmware Update
-Please make sure to change the firmware version in the globals.cpp file before creating a pull request.
-Once the code has been merged please make sure to build the firmware, rename it to the correct version, and commit it to the spaceona-db repository in the correct folder.
+Please make sure to change the firmware version in the globals.cpp file before creating a pull request. The version will be reviewed before it is merged. Once the code has been merged please make sure to build the firmware, rename it to the correct version, and commit it to the backend-go repository in the correct folder.
 
 ### WiFi Configuration
 In order to connect the board to WiFi, please follow the steps below:
