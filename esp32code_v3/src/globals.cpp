@@ -13,7 +13,7 @@
 #include "globals.h"
 
 //Firmware version
-String FIRMWARE_VERSION = "1-3-0";
+String FIRMWARE_VERSION = "1-5-0";
 const int FIRMWARE_VERSION_MAJOR = FIRMWARE_VERSION.substring(0, 1).toInt();
 const int FIRMWARE_VERSION_MINOR = FIRMWARE_VERSION.substring(2, 3).toInt();
 const int FIRMWARE_VERSION_PATCH = FIRMWARE_VERSION.substring(4, 5).toInt();
@@ -50,8 +50,13 @@ String mac_address;
 int heartbeatPeriod = 1;
 
 // Setting up the LEDs
+#ifdef SEEEED_XIAO_ESP32C3
 int led_1 = D3;
 int led_2 = D2;
+#elif ESP32_C3_DEVKITC_02
+int led_1 = 6;
+int led_2 = 10;
+#endif
 
 boolean machineStatus = false;
 //Confidence value for the machine detection

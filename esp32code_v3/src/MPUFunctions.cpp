@@ -1,3 +1,6 @@
+
+#ifdef SEEEED_XIAO_ESP32C3
+
 #include <Arduino.h>
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
@@ -243,3 +246,4 @@ bool motion_detected(Adafruit_MPU6050 &mpu) {
         return false;
     }
 }
+#endif
