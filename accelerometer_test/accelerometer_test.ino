@@ -11,7 +11,7 @@
 Adafruit_MPU6050 mpu;
 
 // Setting up the LED
-int led_1 = D10;
+int led_1 = D8;
 
 void setup(void) {
   Serial.begin(115200);
@@ -158,9 +158,9 @@ bool above_thresh;
 
 //These are just random values. We can change them later (z accel is higher since its experiencing 9.8 g
 // at least in the mounting position of usb port down like we did during the semester)
-const float MPU_ACCEL_X_THRESH = 0.7;
-const float MPU_ACCEL_Y_THRESH = 11;
-const float MPU_ACCEL_Z_THRESH = 0.20;
+const float MPU_ACCEL_X_THRESH = 9.7;
+const float MPU_ACCEL_Y_THRESH = 0.1;
+const float MPU_ACCEL_Z_THRESH = 0.73;
 const float MPU_GYRO_X_THRESH = 2;
 const float MPU_GYRO_Y_THRESH = 2;
 const float MPU_GYRO_Z_THRESH = 2;
@@ -271,6 +271,9 @@ bool motion_detected(Adafruit_MPU6050 &mpu) {
   prev_accel_z = a.acceleration.z;
 
   // Checking if the sensor is in use
+  Serial.println("X gyro:" + String(abs(g.gyro.x)));
+  Serial.println("Y gyro:" + String(abs(g.gyro.y)));
+  Serial.println("Z gyro:" + String(abs(g.gyro.z)));
   Serial.print("X accel: ");
   Serial.println(abs(a.acceleration.x));
   Serial.print("X threshold: ");
@@ -292,7 +295,7 @@ bool motion_detected(Adafruit_MPU6050 &mpu) {
   Serial.print("Change threshold: ");
   Serial.println(ACCEL_CHANGE_THRESH);
 
-  if (abs(a.acceleration.z) >= MPU_ACCEL_Z_THRESH || delta_x >= ACCEL_CHANGE_THRESH || delta_y >= ACCEL_CHANGE_THRESH || delta_z >= ACCEL_CHANGE_THRESH) {
+  if (delta_x >= ACCEL_CHANGE_THRESH || delta_y >= ACCEL_CHANGE_THRESH || delta_z >= ACCEL_CHANGE_THRESH) {
     Serial.println("Motion detected");
     digitalWrite(led_1, HIGH);
     return true;

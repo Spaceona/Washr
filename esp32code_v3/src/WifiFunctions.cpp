@@ -40,19 +40,36 @@ const char* test_root_ca =
     "-----END CERTIFICATE-----\n";
 
 
-void wifi_init(String server_name, HTTPClient& https) {
+boolean wifi_init(String server_name, HTTPClient& https) {
     // Setting up the wifi
     WiFi.mode(WIFI_STA); // Optional
     WiFi.begin(ssid, password);
     Serial.println("\nConnecting");
 
+    //TODO add a timeout for the wifi connection
+
+    // Define a timeout period (e.g., 10 seconds)
+    //const unsigned long wifiTimeout = 1000 * 60 * 5; // 5 minutes
+    const unsigned long wifiTimeout = 30000;
+
+// Record the start time
+    unsigned long startTime = millis();
+
     while (WiFi.status() != WL_CONNECTED) {
+        // Check if the timeout period has been exceeded
+        if (millis() - startTime >= wifiTimeout) {
+            Serial.println("WiFi connection timed out");
+            // Handle the timeout case (e.g., reset the device, retry, etc.)
+            return false;
+        }
         Serial.print(".");
         delay(100);
     }
-    Serial.println("");
 
     Serial.println("\nConnected to the WiFi network");
+
+    Serial.println("Signal strength (RSSI): " + String(WiFi.RSSI()));
+
     Serial.print("Local ESP32 IP: ");
     Serial.println(WiFi.localIP());
 
@@ -75,13 +92,15 @@ void wifi_init(String server_name, HTTPClient& https) {
     //TODO use secure client
     //Testing if the certificate is installed correctly
     //Serial.println("Testing certificate and connection to server");
-    if (!client.connect("api.spaceona.com", 3000)) {
+    if (!client.connect("10.1.1.194", 3001)) {
         Serial.println("Connection failed");
-        return;
+        //TODO change this later when it becomes a problem
+        return true;
     }
     else {
         Serial.println("Connection successful");
     }
+    return true;
 }
 
 void wifiConnect(){
@@ -99,7 +118,7 @@ void wifiConnect(){
 WiFiClient testClient;
 HTTPClient authClient;
 
-boolean serverAuth(){
+int serverAuth(){
     String auth_server;
     JsonDocument device_data;
     JsonDocument auth_data;
@@ -108,15 +127,15 @@ boolean serverAuth(){
     auth_server = server_name + endpoint;
     //Serial.println("Auth server: " + auth_server);
     //Serial.println("Starting HTTPS connection...");
-    if (!authClient.begin(testClient, auth_server)) {
+    if (!authClient.begin(client, auth_server)) {
         Serial.println("Failed to start HTTPS connection");
         return false;
     }
 
 
-    device_data["mac"] = mac_address;
-    device_data["firmwareVersion"] = FIRMWARE_VERSION;
-    device_data["clientKey"] = clientKey;
+    device_data["mac_address"] = mac_address;
+    device_data["firmware_version"] = FIRMWARE_VERSION;
+    device_data["client_key"] = clientKey;
 
     String device_data_string;
     serializeJson(device_data, device_data_string);
@@ -131,7 +150,7 @@ boolean serverAuth(){
 
     if(httpCode > 0){
         String responseBody = authClient.getString();
-        //Serial.println("Response body: " + responseBody);
+        Serial.println("Response body: " + responseBody);
         if(httpCode == 200){
             DeserializationError error = deserializeJson(auth_data, responseBody);
 
@@ -139,11 +158,15 @@ boolean serverAuth(){
                 Serial.print("deserializeJson() failed: ");
                 Serial.println(error.c_str());
                 authClient.end();
-                return false;
+                return -1;
+            } else if(!auth_data.containsKey("Token")){
+                Serial.println("Bad response from server");
+                authClient.end();
+                return -1;
             }
 
             const char* message = auth_data["message"]; // "Authenticated"
-            jwt = String(auth_data["jwt"].as<const char*>()); //converting to a string
+            jwt = String(auth_data["Token"].as<const char*>()); //converting to a string
             //Serial.println("JWT: " + jwt);
             //Serial.println("");
             authenticated = true;
@@ -151,42 +174,42 @@ boolean serverAuth(){
             delay(50);
             digitalWrite(led_1, LOW);
             authClient.end();
-            return true;
+            return 200;
         } else if (httpCode == 400){
             Serial.println("Unauthorized");
             authClient.end();
             authenticated = false;
-            return false;
+            return 400;
         }
-    }
-    else{
+    } else{
         Serial.println("Error on HTTP request");
         authClient.end();
-        return false;
+        return -1;
     }
     authClient.end();
-    return false;
+    return -1;
 }
 
 HTTPClient statusClient;
 
-void machineStatusUpdate(boolean currentMachineStatus){
+int machineStatusUpdate(boolean currentMachineStatus){
     //Setting up the endpoint
-    endpoint = "/update/" + clientName + "/" + building + "/" + type + "/" + id;
+    endpoint = "/status/update";
     String statusServer = server_name + endpoint;
     //Serial.println("Status server: " + statusServer);
 
     //Testing server connection
     Serial.println("Starting HTTPS connection...");
-    if (!statusClient.begin(testClient, statusServer)) {
+    if (!statusClient.begin(client, statusServer)) {
         Serial.println("Failed to start HTTPS connection");
         statusClient.end();
-        return;
+        return -1;
     }
     Serial.println("Connected to the server");
 
     //Setting up the data to be sent
     JsonDocument statusData;
+    statusData["mac_address"] = mac_address;
     statusData["firmwareVersion"] = FIRMWARE_VERSION;
     statusData["status"] = currentMachineStatus;
     statusData["confidence"] = detectionConfidence;
@@ -205,7 +228,7 @@ void machineStatusUpdate(boolean currentMachineStatus){
     Serial.print("Status HTTP Code: ");
     Serial.println(httpCode);
     String responseBody = statusClient.getString();
-    //Serial.println("Response body: " + responseBody);
+    Serial.println("Response body: " + responseBody);
     statusClient.end();
     if(httpCode > 0){
         if(httpCode == 200){
@@ -225,10 +248,82 @@ void machineStatusUpdate(boolean currentMachineStatus){
         } else {
             Serial.println("Failed to update machine status: Unknown error");
         }
-    }
-    else{
+        return httpCode;
+    } else{
         Serial.println("Error on HTTP request");
     }
+    return -1;
+}
+
+
+//TODO swap the testclient to just one client
+int onboardBoard(){
+    Serial.println("Onboarding board");
+    //Setting up the endpoint
+    endpoint = "/onboard/board";
+    String onboardServer = server_name + endpoint;
+    Serial.println("Onboard server: " + onboardServer);
+
+    //Testing server connection
+    Serial.println("Starting HTTPS connection...");
+    if (!statusClient.begin(client, onboardServer)) {
+        Serial.println("Failed to start HTTPS connection");
+        statusClient.end();
+        return -1;
+    }
+
+    //Setting up the data
+    JsonDocument onboardData;
+    onboardData["mac_address"] = mac_address;
+    onboardData["client_name"] = clientName;
+    onboardData["client_key"] = clientKey;
+    String onboardDataString;
+    serializeJson(onboardData, onboardDataString);
+    Serial.println("Data to be sent: " + onboardDataString);
+    //Adding headers
+    //TODO check the headers
+
+    //Posting
+    int httpCode = statusClient.POST(onboardDataString);
+
+    Serial.print("Status HTTP Code: ");
+    Serial.println(httpCode);
+    String responseBody = statusClient.getString();
+    //Serial.println("Response body: " + responseBody);
+    statusClient.end();
+    if(httpCode > 0){
+        if(httpCode == 200){
+            Serial.println("Onboarded board correctly");
+            digitalWrite(led_2, HIGH);
+            delay(100);
+            digitalWrite(led_2, LOW);
+            setupComplete = true;
+            setSetupComplete(setupComplete);
+        }
+        else if (httpCode == 401){
+            Serial.println("Unauthorized");
+            setupComplete = false;
+            setSetupComplete(setupComplete);
+        } else if(httpCode == 400){
+            Serial.println("Bad request");
+            setupComplete = false;
+            setSetupComplete(setupComplete);
+        } else if(httpCode == 500){
+            Serial.println("Internal server error");
+            setupComplete = false;
+            setSetupComplete(setupComplete);
+        } else {
+            Serial.println("Failed to update machine status: Unknown error");
+            setupComplete = false;
+            setSetupComplete(setupComplete);
+        }
+        return httpCode;
+    } else {
+        Serial.println("Error on HTTP request");
+    }
+    setupComplete = false;
+    setSetupComplete(setupComplete);
+    return -1;
 }
 
 //TODO change this to a secure connection when it is implemented on the server
@@ -239,7 +334,7 @@ void otaUpdate(String updateFirmware) {
     String firmwareServer = server_name + firmwareEndpoint;
 
     Serial.println("Firmware server: " + firmwareServer);
-    t_httpUpdate_return ret = httpUpdate.update(testClient,  firmwareServer, requestCallback);
+    t_httpUpdate_return ret = httpUpdate.update(client,  firmwareServer, requestCallback);
 
     switch (ret) {
     case HTTP_UPDATE_FAILED:
@@ -276,6 +371,7 @@ void setClock() {
 }
 
 //Returns 7pm the next day
+//TODO change this to have it be a parameter
 time_t firmwareUpdateTime() {
     setClock();
     time_t now = myTimezone.now();
@@ -326,7 +422,6 @@ void firmwareCheck() {
 }
 
 
-
 HTTPClient firmwareClient;
 
 String latestFirmware(){
@@ -338,7 +433,7 @@ String latestFirmware(){
 
     //Testing server connection
     Serial.println("Starting HTTPS connection...");
-    if (!firmwareClient.begin(testClient, firmwareServer)) {
+    if (!firmwareClient.begin(client, firmwareServer)) {
         Serial.println("Failed to start HTTPS connection");
         firmwareClient.end();
         return "error";
@@ -396,4 +491,47 @@ String latestFirmware(){
         Serial.println("Error on HTTP request");
         return "error";
     }
+}
+
+//Returns X minutes from current time
+time_t heartbeatUpdateTime(int minutePeriod) {
+    time_t now = myTimezone.now();
+
+    tmElements_t tm;
+    breakTime(now, tm);
+
+    // Add minutePeriod minutes to the current time
+    tm.Minute += minutePeriod;
+
+    // Handle overflow of minutes
+    if (tm.Minute >= 60) {
+        tm.Minute -= 60;
+        tm.Hour += 1;
+    }
+
+    // Handle overflow of hours
+    if (tm.Hour >= 24) {
+        tm.Hour -= 24;
+        tm.Day += 1;
+    }
+
+    //Return the new time
+    return makeTime(tm);
+}
+
+//Sending the heartbeat to the server every x minutes
+void sendHeartbeat(){
+    time_t heartbeatTime = heartbeatUpdateTime(heartbeatPeriod);
+    Serial.println("Event callback reached. Sending heartbeat");
+
+    int returnCode = machineStatusUpdate(machineStatus);
+
+    if(returnCode == 200){
+        Serial.println("Heartbeat sent successfully");
+        heartbeatSent = true;
+    } else {
+        Serial.println("Failed to send heartbeat");
+        heartbeatSent = false;
+    }
+    //TODO figure out what to do if the heartbeat isn't sent successfully
 }

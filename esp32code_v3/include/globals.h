@@ -25,15 +25,13 @@ extern String timezone_name;
 extern WiFiClientSecure client;
 
 extern String clientKey;
+extern String clientName;
 
 extern String server_name;
 extern String endpoint;
 extern String serverPort;
 
-extern String clientName;
-extern String building;
-extern String type;
-extern String id;
+extern boolean setupComplete;
 
 extern String jwt;
 extern boolean authenticated;
@@ -45,8 +43,11 @@ extern String ssid;
 extern String password;
 extern String mac_address;
 
+extern int heartbeatPeriod;
+
 extern boolean machineStatus;
 extern int detectionConfidence;
+extern boolean heartbeatSent;
 
 extern Preferences flashStorage;
 

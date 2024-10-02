@@ -6,9 +6,7 @@
 #define ESP32CODE_V3_FLASHSTORAGE_H
 
 #include <Arduino.h>
-#include <preferences.h>
-#include <ArduinoJson.h>
-#include "globals.h"
+
 
 boolean flashStorageInit();
 
@@ -24,6 +22,8 @@ String getWifiPassword();
 
 void clearWifiCredentials();
 
+boolean setSetupComplete(boolean setupComplete);
 
+boolean isSetupComplete();
 
 #endif //ESP32CODE_V3_FLASHSTORAGE_H
