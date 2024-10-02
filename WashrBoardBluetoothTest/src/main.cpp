@@ -22,6 +22,8 @@ void onSSIDWritten(BLEDevice central, BLECharacteristic characteristic);
 void onPasswordWritten(BLEDevice central, BLECharacteristic characteristic);
 void onClientKeyWritten(BLEDevice central, BLECharacteristic characteristic);
 void onClientNameWritten(BLEDevice central, BLECharacteristic characteristic);
+void onCentralDisconnected(BLEDevice central);
+void bluetoothShutdown();
 
 void setup() {
     Serial.begin(115200);
@@ -51,6 +53,7 @@ void setup() {
     passwordCharacteristic.setEventHandler(BLEWritten, onPasswordWritten);
     clientKeyCharacteristic.setEventHandler(BLEWritten, onClientKeyWritten);
     clientNameCharacteristic.setEventHandler(BLEWritten, onClientNameWritten);
+    BLE.setEventHandler(BLEDisconnected, onCentralDisconnected);
 
     BLE.advertise();
 
@@ -109,4 +112,20 @@ void onClientNameWritten(BLEDevice central, BLECharacteristic characteristic) {
     clientName = String(buffer);
     Serial.print("Client Name updated to: ");
     Serial.println(clientName);
+}
+
+void onCentralDisconnected(BLEDevice central) {
+    //Serial.print("Disconnected from central: ");
+    //Serial.println(central.address());
+    Serial.println("Central disconnected");
+    delay(5000); // Delay to ensure the central has time to disconnect
+    Serial.println("Shutting down BLE");
+    bluetoothShutdown(); // Call the shutdown function or any other cleanup code
+}
+
+void bluetoothShutdown() {
+    BLE.disconnect(); // Disconnect from the central
+    BLE.stopAdvertise(); // Stop advertising
+    BLE.end(); // Shut down BLE
+    Serial.println("BLE Peripheral - Shutdown");
 }
