@@ -7,7 +7,7 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include "MPUFunctions.h"
-#elif ESP32_C3_DEVKITC_02
+#elif CUSTOM_BOARD
 #include <ICM42670P.h>
 #include "IMUFunctions.h"
 #endif
@@ -27,7 +27,7 @@
 #ifdef SEEEED_XIAO_ESP32C3
 // Setting up the MPU
 Adafruit_MPU6050 mpu;
-#elif ESP32_C3_DEVKITC_02
+#elif CUSTOM_BOARD
 ICM42670 imu(Wire,0);
 int accelRange = 2;
 int gyroRange = 2000;
@@ -54,7 +54,7 @@ void setup() {
     #ifdef SEEEED_XIAO_ESP32C3
     //Initializing MPU6050 on seeed board
     mpu_init(mpu, MPU6050_RANGE_2_G, MPU6050_RANGE_500_DEG, MPU6050_BAND_5_HZ);
-    #elif ESP32_C3_DEVKITC_02
+    #elif CUSTOM_BOARD
     //Initializing the IMU on the ESP32C3
     imu_init(imu, accelRange, gyroRange);
 
@@ -77,7 +77,7 @@ int mpu_period = 100; //In milliseconds
 // Setting up the timers for the mpu debounce state machine
 unsigned long mpu_timer1 = 0;
 unsigned long mpu_timer2 = millis();
-#elif ESP32_C3_DEVKITC_02
+#elif CUSTOM_BOARD
 int imu_period = 100; //In milliseconds
 // Setting up the timers for the imu debounce state machine
 unsigned long imu_timer1 = 0;
@@ -94,7 +94,7 @@ void loop() {
 
     #ifdef SEEEED_XIAO_ESP32C3
     mpu_timer2 = millis();
-    #elif ESP32_C3_DEVKITC_02
+    #elif CUSTOM_BOARD
     imu_timer2 = millis();
     #endif
 
@@ -106,7 +106,7 @@ void loop() {
         //Serial.println(in_use);
         mpu_timer1 = mpu_timer2;
     }
-    #elif ESP32_C3_DEVKITC_02
+    #elif CUSTOM_BOARD
     // Updating the IMUs debouncing state machine
     if ((imu_timer2 - imu_timer1) >= imu_period) {
         machineStatus = imu_tick(imu, accelRange, gyroRange);

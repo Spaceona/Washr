@@ -4,7 +4,7 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include "MPUFunctions.h"
-#elif ESP32_C3_DEVKITC_02
+#elif CUSTOM_BOARD
 #include <ICM42670P.h>
 #include "IMUFunctions.h"
 #endif

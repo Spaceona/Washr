@@ -12,12 +12,13 @@ It also updated the code to use the PlatformIO IDE instead of the Arduino IDE.
 2. Install [PlatformIO](https://platformio.org/install/) as an extension in your IDE.
 3. Open the `esp32code_v3` folder in your IDE.
 4. Open the PlatformIO Home from the PlatformIO extension in your IDE.
+5. Make sure to select the environment which corresponds to the board you are using (e.g. `custom-board` for our custom board).
 5. Build the project using the PlatformIO build button.
 6. Upload the project to the ESP32C3 board using the PlatformIO upload button.
 7. Open the serial monitor to view the output of the ESP32C3 board. (If using Clion, don't use the upload and monitor button, instead use the Clion Serial Monitor Plugin)
 8. Make changes to the code and test them on the ESP32C3 board.
 9. If you are going to add new libraries to the project, add them to the `platformio.ini` file.
-10. Make sure that you develop your changes in a seperate branch in Git
+10. Make sure that you develop your changes in a separate branch in Git
 
 ### Code Style
 TODO

@@ -1,7 +1,7 @@
 //Created by Robbie Leslie
 //Modified by
 
-#ifdef ESP32_C3_DEVKITC_02
+#ifdef CUSTOM_BOARD
 
 #include <Arduino.h>
 #include <ICM42670P.h>

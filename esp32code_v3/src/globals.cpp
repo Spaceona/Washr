@@ -53,7 +53,7 @@ int heartbeatPeriod = 1;
 #ifdef SEEEED_XIAO_ESP32C3
 int led_1 = D3;
 int led_2 = D2;
-#elif ESP32_C3_DEVKITC_02
+#elif CUSTOM_BOARD
 int led_1 = 6;
 int led_2 = 10;
 #endif
