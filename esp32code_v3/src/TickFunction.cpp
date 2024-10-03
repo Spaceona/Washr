@@ -2,8 +2,16 @@
 // Modified by
 
 #include <Arduino.h>
+
+#ifdef SEEEED_XIAO_ESP32C3
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
+#include "MPUFunctions.h"
+#elif CUSTOM_BOARD
+#include <ICM42670P.h>
+#include "IMUFunctions.h"
+#endif
+
 #include <Wire.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -11,7 +19,6 @@
 #include "globals.h"
 #include "TickFunction.h"
 #include "WifiFunctions.h"
-#include "MPUFunctions.h"
 #include "flashStorage.h"
 #include "bluetoothFunctions.h"
 
