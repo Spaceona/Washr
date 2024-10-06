@@ -8,6 +8,8 @@ void setup(){
     Serial.begin(115200);
     delay(2000);
 
+    Serial.println("MAC Address: " + WiFi.macAddress());
+
     WiFi.mode(WIFI_STA); //Optional
     WiFi.begin(ssid, password);
     Serial.println("\nConnecting");
