@@ -41,6 +41,11 @@ const char* test_root_ca =
 
 
 boolean wifi_init(String server_name, HTTPClient& https) {
+    // Get MAC address of the WiFi station interface
+    mac_address = WiFi.macAddress();
+    Serial.println("Mac Address: ");
+    Serial.println(mac_address);
+
     // Setting up the wifi
     WiFi.mode(WIFI_STA); // Optional
     WiFi.begin(ssid, password);
