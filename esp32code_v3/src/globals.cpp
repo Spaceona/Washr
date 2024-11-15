@@ -13,7 +13,7 @@
 #include "globals.h"
 
 //Firmware version
-String FIRMWARE_VERSION = "1-5-0";
+String FIRMWARE_VERSION = "1-6-0";
 const int FIRMWARE_VERSION_MAJOR = FIRMWARE_VERSION.substring(0, 1).toInt();
 const int FIRMWARE_VERSION_MINOR = FIRMWARE_VERSION.substring(2, 3).toInt();
 const int FIRMWARE_VERSION_PATCH = FIRMWARE_VERSION.substring(4, 5).toInt();
@@ -33,8 +33,9 @@ String serverPort = "3001";
 
 //A secret key which is different for each SpaceOna client (used for authentication)
 //We might want an initial key so the board can connect to the backend and then get the correct client key
-String clientKey = "S1@zQvxf(@JATjXR3r5hHAgwq";
-String clientName = "test3";
+//TODO change the client_key and client_name later to not be in the wifi_secrets.h file
+String clientKey = CLIENT_KEY;
+String clientName = CLIENT_NAME;
 
 boolean setupComplete = false;
 

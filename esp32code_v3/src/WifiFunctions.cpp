@@ -131,7 +131,8 @@ int serverAuth(){
     endpoint = "/auth/device";
     auth_server = server_name + endpoint;
     //Serial.println("Auth server: " + auth_server);
-    //Serial.println("Starting HTTPS connection...");
+    Serial.println("Authenticating with the server");
+    Serial.println("Starting HTTPS connection...");
     if (!authClient.begin(client, auth_server)) {
         Serial.println("Failed to start HTTPS connection");
         return false;
@@ -204,13 +205,14 @@ int machineStatusUpdate(boolean currentMachineStatus){
     //Serial.println("Status server: " + statusServer);
 
     //Testing server connection
+    Serial.println("Machine status update");
     Serial.println("Starting HTTPS connection...");
     if (!statusClient.begin(client, statusServer)) {
         Serial.println("Failed to start HTTPS connection");
         statusClient.end();
         return -1;
     }
-    Serial.println("Connected to the server");
+    Serial.println("Connected to the server: Updating machine status");
 
     //Setting up the data to be sent
     JsonDocument statusData;
@@ -294,7 +296,7 @@ int onboardBoard(){
     Serial.print("Status HTTP Code: ");
     Serial.println(httpCode);
     String responseBody = statusClient.getString();
-    //Serial.println("Response body: " + responseBody);
+    Serial.println("Response body: " + responseBody);
     statusClient.end();
     if(httpCode > 0){
         if(httpCode == 200){
@@ -318,7 +320,7 @@ int onboardBoard(){
             setupComplete = false;
             setSetupComplete(setupComplete);
         } else {
-            Serial.println("Failed to update machine status: Unknown error");
+            Serial.println("Failed to onboard: Unknown error");
             setupComplete = false;
             setSetupComplete(setupComplete);
         }
@@ -538,5 +540,6 @@ void sendHeartbeat(){
         Serial.println("Failed to send heartbeat");
         heartbeatSent = false;
     }
+    myTimezone.setEvent(sendHeartbeat, heartbeatTime);
     //TODO figure out what to do if the heartbeat isn't sent successfully
 }

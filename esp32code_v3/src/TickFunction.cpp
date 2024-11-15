@@ -87,6 +87,7 @@ void tickFunction() {
             time_t heartbeatTime = heartbeatUpdateTime(heartbeatPeriod);
 
             //Setting up the firmware check event
+            Serial.println("Setting up firmware check event and heartbeat event");
             myTimezone.setEvent(firmwareCheck, firmwareTime);
             myTimezone.setEvent(sendHeartbeat, heartbeatTime);
 
