@@ -386,11 +386,25 @@ time_t firmwareUpdateTime() {
     tmElements_t tm;
     breakTime(now, tm);
 
+    /*
     // Set the time to 3 AM tomorrow
     tm.Hour = 3;  // 3 Am
     tm.Minute = 0; // 0 minutes
     tm.Second = 0; // 0 seconds
     tm.Day += 1;   // Move to the next day
+     */
+
+    //TODO have this either be a debug flag or change this back to original time
+    // Set the time to the next hour for debug purposes
+    tm.Hour += 1;  // Increment the hour by 1
+    tm.Minute = 0; // Set minutes to 0
+    tm.Second = 0; // Set seconds to 0
+
+    // Handle overflow of hours
+    if (tm.Hour >= 24) {
+        tm.Hour = 0;
+        tm.Day += 1;
+    }
 
     //Return the new time
     return makeTime(tm);

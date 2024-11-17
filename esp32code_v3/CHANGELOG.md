@@ -2,6 +2,16 @@ Changelog
 
 ## [Unreleased]
 
+## [1.6.1] - 2024-08-09
+### Changed
+- Changed the event time to every hour for the firmware update for debugging purposes.
+- Increased the IMU acceleration threshold from 0.03 to 0.1
+
+## [1.6.0] - 2024-11-15
+### Changed
+- Initial version of firmware for long term testing/deployment
+
+
 ## [1.2.1] - 2024-08-09
 ### Changed
 - Changed the event time to 3:00 AM for the firmware update.
