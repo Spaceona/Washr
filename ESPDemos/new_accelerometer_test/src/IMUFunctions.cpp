@@ -97,6 +97,7 @@ enum IMU_States {
 bool IMU_tick() {
 
     above_thresh = motion_detected();
+    Serial.println("Number seen: " + String(number_seen));
 
     switch (IMU_State) { //Transitions
         case Start:
@@ -182,7 +183,7 @@ double prev_accel_y = 0.0;
 double prev_accel_z = 0.0;
 
 // Threshold for change in acceleration
-const float ACCEL_CHANGE_THRESH = 0.03; // Adjust this value as needed
+const float ACCEL_CHANGE_THRESH = 0.1; // Adjust this value as needed
 
 bool motion_detected() {
     //Need to get the acceleration data from the IMU here
