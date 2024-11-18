@@ -7,7 +7,6 @@
 #include <ICM42670P.h>
 #include <Wire.h>
 #include "IMUFunctions.h"
-#include "IMUConversion.h"
 #include "globals.h"
 
 #define I2C_SDA_PIN 4
@@ -180,6 +179,22 @@ bool motion_detected(ICM42670 &IMU, int accelRange, int gyroRange) {
         return true;
     } else {
         return false;
+    }
+}
+
+double accelToMps2(double accelData, int accelRange) {
+
+    switch(accelRange) {
+        case 2:
+            return (accelData / 16384.0) * 9.81;
+        case 4:
+            return (accelData / 8192.0) * 9.81;
+        case 8:
+            return (accelData / 4096.0) * 9.81;
+        case 16:
+            return (accelData / 2048.0) * 9.81;
+        default:
+            return -1; // Error
     }
 }
 

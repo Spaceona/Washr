@@ -8,6 +8,11 @@
 #include "globals.h"
 #include "flashStorage.h"
 
+//TODO write better comments for how these methods work instead of what they do
+/**
+ * Initializes the Flash Storage to store credentials
+ * @return Returns true if the storage is successfully initialized
+ */
 boolean flashStorageInit(){
     flashStorage.end();
     flashStorage.begin("creds", true, "nvs");
@@ -15,6 +20,7 @@ boolean flashStorageInit(){
     boolean flashInit = flashStorage.isKey("nvsInit");
 
     if(!flashInit){
+        //TODO update this to store client key as well
         flashStorage.end();
         flashStorage.begin("creds", false, "nvs");
         flashStorage.putBool("hasCreds", false);
@@ -26,6 +32,10 @@ boolean flashStorageInit(){
     return true;
 }
 
+/**
+ * Checks if the board has wifi credentials in the flash storage
+ * @return Returns true if the board has wifi credentials stored
+ */
 boolean hasWifiCredentials() {
     flashStorage.end();
     flashStorage.begin("creds", true, "nvs");
@@ -40,6 +50,11 @@ boolean hasWifiCredentials() {
     return hasCredentials;
 }
 
+/**
+ * Writes if the board has wifi credentials to flash
+ * @param hasCredentials The value to write
+ * @return Returns true if it successfully writes to flash
+ */
 boolean setHasWifiCredentials(boolean hasCredentials) {
     flashStorage.end();
     flashStorage.begin("creds", false, "nvs");
@@ -53,6 +68,12 @@ boolean setHasWifiCredentials(boolean hasCredentials) {
     return true;
 }
 
+/**
+ * Writes new wifi credentials to the flash
+ * @param newSsid The new SSID to write to flash
+ * @param newPassword The new password to write to flash
+ * @return Returns true if it successfully writes to flash
+ */
 boolean setWifiCredentials(String newSsid, String newPassword) {
     flashStorage.end();
     flashStorage.begin("creds", false, "nvs");
@@ -74,6 +95,10 @@ boolean setWifiCredentials(String newSsid, String newPassword) {
     return true;
 }
 
+/**
+ * Gets the wifi SSID stored in flash
+ * @return The SSID stored in flash
+ */
 String getWifiSsid() {
     flashStorage.end();
     flashStorage.begin("creds", true, "nvs");
@@ -82,6 +107,10 @@ String getWifiSsid() {
     return storedSsid;
 }
 
+/**
+ * Gets the wifi password stored in flash
+ * @return The wifi password stored in flash
+ */
 String getWifiPassword() {
     flashStorage.end();
     flashStorage.begin("creds", false, "nvs");
@@ -90,6 +119,9 @@ String getWifiPassword() {
     return storedPassword;
 }
 
+/**
+ * Clears all the flash for the wifi credentials
+ */
 void clearWifiCredentials() {
     flashStorage.end();
     flashStorage.begin("creds", false, "nvs");
@@ -98,6 +130,11 @@ void clearWifiCredentials() {
     flashStorage.end();
 }
 
+/**
+ * Writes if the board has finished setup to the flash
+ * @param setupComplete A boolean saying if the board has been setup to write to flash
+ * @return Returns true if it successfully writes to flash
+ */
 boolean setSetupComplete(boolean setupComplete) {
     flashStorage.end();
     flashStorage.begin("creds", false, "nvs");
@@ -106,6 +143,10 @@ boolean setSetupComplete(boolean setupComplete) {
     return true;
 }
 
+/**
+ * Checks the flash to see if the board has been set up
+ * @return Returns true if the board has been setup according to the flash
+ */
 boolean isSetupComplete() {
     flashStorage.end();
     flashStorage.begin("creds", true, "nvs");

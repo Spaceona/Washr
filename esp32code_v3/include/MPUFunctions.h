@@ -3,7 +3,13 @@
 
 #include <Arduino.h>
 
-//Initializes the MPU
+/**
+ * Initializes the MPU with the specified ranges
+ * @param mpu An instance of the mpu object
+ * @param accel_range The range of the accelerometer using the mpu6050_accel_range_t type
+ * @param gyro_range The range of the gyroscope using the mpu6050_gyro_range_t type
+ * @param bandwidth The bandwidth of the MPU
+ */
 void mpu_init(Adafruit_MPU6050 &mpu, mpu6050_accel_range_t accel_range, mpu6050_gyro_range_t gyro_range, mpu6050_bandwidth_t bandwidth);
 
 //Gets the MPU data as a string in the form of "{"accelerometer":{"z":data,"y":data,"x":data},"gyroscope":{"z":data,"y":data,"x":data}}"
