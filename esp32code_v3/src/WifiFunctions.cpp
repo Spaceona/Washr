@@ -198,7 +198,7 @@ int serverAuth(){
 
 HTTPClient statusClient;
 
-int machineStatusUpdate(boolean currentMachineStatus){
+int machineStatusUpdate(boolean currentMachineStatus, boolean previousMachineStatus){
     //Setting up the endpoint
     endpoint = "/status/update";
     String statusServer = server_name + endpoint;
@@ -217,9 +217,11 @@ int machineStatusUpdate(boolean currentMachineStatus){
     //Setting up the data to be sent
     JsonDocument statusData;
     statusData["mac_address"] = mac_address;
-    statusData["firmwareVersion"] = FIRMWARE_VERSION;
-    statusData["status"] = currentMachineStatus;
-    statusData["confidence"] = detectionConfidence;
+    statusData["firmware_version"] = FIRMWARE_VERSION;
+    statusData["Status"] = currentMachineStatus;
+    statusData["StatusChanged"] = previousMachineStatus;
+    statusData["timeBetweenChange"] = -1; //TODO change this later
+    statusData["Confidence"] = detectionConfidence;
     String statusDataString;
     serializeJson(statusData, statusDataString);
     //Serial.println("Data to be sent: " + statusDataString);
@@ -545,7 +547,7 @@ void sendHeartbeat(){
     time_t heartbeatTime = heartbeatUpdateTime(heartbeatPeriod);
     Serial.println("Event callback reached. Sending heartbeat");
 
-    int returnCode = machineStatusUpdate(machineStatus);
+    int returnCode = machineStatusUpdate(machineStatus, previousMachineStatus);
 
     if(returnCode == 200){
         Serial.println("Heartbeat sent successfully");

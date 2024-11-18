@@ -14,7 +14,7 @@ void wifiConnect();
 
 int serverAuth();
 
-int machineStatusUpdate(boolean currentMachineStatus);
+int machineStatusUpdate(boolean currentMachineStatus, boolean previousMachineStatus);
 
 //Used to check a webserver for a new firmware version (WIP)
 void otaUpdate(String updateFirmware);
