@@ -25,7 +25,7 @@ String timezone_name = "America/New_York";
 //Global wifi client
 WiFiClientSecure client;
 
-//TODO change this to the backend server when backend changes are merged
+
 String server_name = "https://api.spaceona.com";
 String endpoint = "";
 String serverPort = "3001";

@@ -143,6 +143,7 @@ float prev_accel_z = 0.0;
 // Threshold for change in acceleration
 const float ACCEL_CHANGE_THRESH = 0.1; // Adjust this value as needed
 
+
 bool motion_detected(ICM42670 &IMU, int accelRange, int gyroRange) {
 
     // Get the acceleration data

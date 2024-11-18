@@ -16,7 +16,7 @@
 void imu_init(ICM42670 &IMU, int accelRange, int gyroRange);
 
 /**
- * The tick for the IMU state machine. Used to determine if a machine is on or not over a period of time
+ * The tick for the IMU state machine. Used to determine if a machine is on or not over a period of time, and debounce the signal
  * @param IMU And instance of the IMU object
  * @param accelRange The accelerometer range. Ranges are 2, 4, 8, 16 from most sensitive to least
  * @param gyroRange The gyro range. Ranges are //TODO fix this

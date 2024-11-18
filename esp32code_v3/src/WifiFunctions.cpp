@@ -15,6 +15,7 @@
 
 
 // Setting up the server certificate
+//TODO figure out how to get the server certificate from the server and have it work on the board
 const char* test_root_ca =
     "-----BEGIN CERTIFICATE-----\n"
     "MIIDpDCCA0ugAwIBAgIQPWjtzWvFvUUREnPm431e2jAKBggqhkjOPQQDAjA7MQsw\n"
@@ -51,13 +52,11 @@ boolean wifi_init(String server_name, HTTPClient& https) {
     WiFi.begin(ssid, password);
     Serial.println("\nConnecting");
 
-    //TODO add a timeout for the wifi connection
-
     // Define a timeout period (e.g., 10 seconds)
     //const unsigned long wifiTimeout = 1000 * 60 * 5; // 5 minutes
     const unsigned long wifiTimeout = 30000;
 
-// Record the start time
+    // Record the start time
     unsigned long startTime = millis();
 
     while (WiFi.status() != WL_CONNECTED) {
@@ -94,17 +93,18 @@ boolean wifi_init(String server_name, HTTPClient& https) {
 
     //Serial.println(test_root_ca);
 
+    /*
     //TODO use secure client
     //Testing if the certificate is installed correctly
     //Serial.println("Testing certificate and connection to server");
-    if (!client.connect("10.1.1.194", 3001)) {
+    if (!client.connect("api.spaceona.com", 3001)) {
         Serial.println("Connection failed");
         //TODO change this later when it becomes a problem
         return true;
     }
     else {
         Serial.println("Connection successful");
-    }
+    }*/
     return true;
 }
 
@@ -120,7 +120,6 @@ void wifiConnect(){
 }
 
 //Setting up the HTTPS information
-WiFiClient testClient;
 HTTPClient authClient;
 
 int serverAuth(){
@@ -263,7 +262,6 @@ int machineStatusUpdate(boolean currentMachineStatus){
 }
 
 
-//TODO swap the testclient to just one client
 int onboardBoard(){
     Serial.println("Onboarding board");
     //Setting up the endpoint
@@ -287,8 +285,6 @@ int onboardBoard(){
     String onboardDataString;
     serializeJson(onboardData, onboardDataString);
     Serial.println("Data to be sent: " + onboardDataString);
-    //Adding headers
-    //TODO check the headers
 
     //Posting
     int httpCode = statusClient.POST(onboardDataString);
