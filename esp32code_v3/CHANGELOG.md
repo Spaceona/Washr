@@ -2,6 +2,10 @@ Changelog
 
 ## [Unreleased]
 
+## [1.6.2] - 2025-1-4
+### Changed
+- Changed the event time to every minute for the firmware update for remote development purposes.
+
 ## [1.6.1] - 2024-08-09
 ### Changed
 - Changed the event time to every hour for the firmware update for debugging purposes.

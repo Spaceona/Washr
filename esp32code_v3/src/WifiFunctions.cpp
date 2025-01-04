@@ -396,9 +396,15 @@ time_t firmwareUpdateTime() {
 
     //TODO have this either be a debug flag or change this back to original time
     // Set the time to the next hour for debug purposes
-    tm.Hour += 1;  // Increment the hour by 1
-    tm.Minute = 0; // Set minutes to 0
+    tm.Hour = 0;  // set the hour to 0
+    tm.Minute += 1; // Increment the minutes by 1
     tm.Second = 0; // Set seconds to 0
+
+    // Handle overflow of minutes
+    if (tm.Minute >= 60) {
+        tm.Minute -= 60;
+        tm.Hour += 1;
+    }
 
     // Handle overflow of hours
     if (tm.Hour >= 24) {
@@ -422,6 +428,7 @@ void firmwareCheck() {
         return;
     }
 
+    //TODO fix this because it will break if it is double digits
     int latestMajorVersion = latest_Firmware.substring(0, 1).toInt();
     int latestMinorVersion = latest_Firmware.substring(2, 3).toInt();
     int latestPatchVersion = latest_Firmware.substring(4, 5).toInt();
