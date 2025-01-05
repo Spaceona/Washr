@@ -396,9 +396,9 @@ time_t firmwareUpdateTime() {
 
     //TODO have this either be a debug flag or change this back to original time
     // Set the time to the next hour for debug purposes
-    tm.Hour = 0;  // set the hour to 0
-    tm.Minute += 1; // Increment the minutes by 1
-    tm.Second = 0; // Set seconds to 0
+    //tm.Hour = 0;  // set the hour to 0
+    tm.Minute += 5; // Increment the minutes by 1
+    //tm.Second = 0; // Set seconds to 0
 
     // Handle overflow of minutes
     if (tm.Minute >= 60) {
