@@ -19,6 +19,20 @@ jobs:
           python-version: '3.11'
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
-
+      - name: wifi creds #temp fix to test if firmware builds
+        run: touch ./include/wifi_secrets.h
+      - name: add dummy stuff
+        run: |
+          cat <<-EOF > ./include/wifi_secrets.h
+            #ifndef WIFI_SECRETS_H
+            #define WIFI_SECRETS_H
+  
+            #define WIFI_SSID ""
+            #define WIFI_PASSWORD ""
+            #define CLIENT_NAME ""
+            #define CLIENT_KEY ""
+  
+            #endif //WIFI_SECRETS_H
+          EOF
       - name: Build PlatformIO Project
         run: pio run
