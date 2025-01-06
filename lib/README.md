@@ -1,3 +1,4 @@
+[![PlatformIO CI](https://github.com/Spaceona/Washr/actions/workflows/PlatformIO_CI.yaml/badge.svg)](https://github.com/Spaceona/Washr/actions/workflows/PlatformIO_CI.yaml)
 
 This directory is intended for project specific (private) libraries.
 PlatformIO will compile them to static libraries and link into executable file.
