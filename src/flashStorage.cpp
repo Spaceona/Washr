@@ -3,7 +3,7 @@
 //
 
 #include <Arduino.h>
-#include <preferences.h>
+#include <Preferences.h>
 #include <ArduinoJson.h>
 #include "globals.h"
 #include "flashStorage.h"
