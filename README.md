@@ -47,6 +47,8 @@ In order to connect the board to WiFi, please follow the steps below:
 
 #define WIFI_SSID "YOUR_SSID"
 #define WIFI_PASSWORD "YOUR_PASSWORD"
+#define CLIENT_NAME ""
+#define CLIENT_KEY ""
 
 #endif //WIFI_SECRETS_H
 ```

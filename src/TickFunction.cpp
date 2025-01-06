@@ -33,7 +33,6 @@ enum States {
     Wait
 } Sensor_State;
 
-boolean previousMachineStatus;
 int previousHttpCode;
 int setupTries = 0;
 int setupThreshold = 8; //Can change this depend on how fast the tick function is running
@@ -138,7 +137,7 @@ void tickFunction() {
 
                 //Retrying to send the data if the previous request failed
                 if (previousHttpCode != 200) {
-                    int httpCode = machineStatusUpdate(machineStatus);
+                    int httpCode = machineStatusUpdate(machineStatus, previousMachineStatus);
                     //TODO add a way to not have this run every tick after a couple of failed attempts
                     previousHttpCode = httpCode;
                 }
@@ -146,7 +145,7 @@ void tickFunction() {
                 // Transmitting the data if the machine status has changed
                 if (machineStatus != previousMachineStatus) {
                     previousMachineStatus = machineStatus;
-                    int httpCode = machineStatusUpdate(machineStatus);
+                    int httpCode = machineStatusUpdate(machineStatus, previousMachineStatus);
                     //TODO figure out what to do if it doesn't send correctly
                     previousHttpCode = httpCode;
                 } else {

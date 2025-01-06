@@ -61,6 +61,7 @@ int led_2 = 10;
 #endif
 
 boolean machineStatus = false;
+boolean previousMachineStatus = false;
 //Confidence value for the machine detection
 int detectionConfidence = 0;
 boolean heartbeatSent = false;
