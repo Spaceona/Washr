@@ -8,7 +8,7 @@
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 #include <ezTime.h>
-#include <preferences.h>
+#include <Preferences.h>
 #include "flashStorage.h"
 #include "globals.h"
 

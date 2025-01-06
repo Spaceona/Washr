@@ -11,7 +11,7 @@
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
 #include <ezTime.h>
-#include <preferences.h>
+#include <Preferences.h>
 #include "wifi_secrets.h"
 
 extern String FIRMWARE_VERSION;
