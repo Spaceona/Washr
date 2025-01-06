@@ -4,7 +4,9 @@
 #include <Arduino.h>
 
 
-//Tick function for the central logic. Right now just constantly transmits the raw sensor data
+/**
+ * The tick function for the central logic. See the state transitions diagram for more information
+ */
 void tickFunction();
 
 #endif
