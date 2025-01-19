@@ -165,7 +165,7 @@ int serverAuth(){
                 Serial.println(error.c_str());
                 authClient.end();
                 return -1;
-            } else if(!auth_data.containsKey("Token")){
+            } else if(!auth_data["Token"].is<const char*>()){
                 Serial.println("Bad response from server");
                 authClient.end();
                 return -1;
