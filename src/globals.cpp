@@ -13,7 +13,7 @@
 #include "globals.h"
 
 //Firmware version
-String FIRMWARE_VERSION = "1-6-3";
+String FIRMWARE_VERSION = "1-6-4";
 //TODO fix this for double digit values
 const int FIRMWARE_VERSION_MAJOR = FIRMWARE_VERSION.substring(0, 1).toInt();
 const int FIRMWARE_VERSION_MINOR = FIRMWARE_VERSION.substring(2, 3).toInt();
@@ -61,6 +61,7 @@ int led_2 = 10;
 #endif
 
 boolean machineStatus = false;
+boolean previousMachineStatus = false;
 //Confidence value for the machine detection
 int detectionConfidence = 0;
 boolean heartbeatSent = false;

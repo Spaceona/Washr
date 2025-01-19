@@ -46,6 +46,7 @@ extern String mac_address;
 extern int heartbeatPeriod;
 
 extern boolean machineStatus;
+extern boolean previousMachineStatus;
 extern int detectionConfidence;
 extern boolean heartbeatSent;
 

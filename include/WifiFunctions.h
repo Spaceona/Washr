@@ -31,7 +31,7 @@ int serverAuth();
  * @param currentMachineStatus The current status of the machine
  * @return Returns the HTTP code of the request, or -1 if there is an error
  */
-int machineStatusUpdate(boolean currentMachineStatus);
+int machineStatusUpdate(boolean currentMachineStatus, boolean prevMachineStatus);
 
 /**
  * Checks the server for a new firmware version
