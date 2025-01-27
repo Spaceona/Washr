@@ -127,6 +127,7 @@ bool imu_tick(ICM42670 &IMU, int accelRange, int gyroRange) {
 // Super basic detection algorithm, should probably upgrade now.
 // Using the accelerometer to get the data
 
+#ifdef CUSTOM_BOARD_V4
 //These are just random values. We can change them later (z accel is higher since its experiencing 9.8 g
 // at least in the mounting position of usb port down like we did during the semester)
 const float MPU_ACCEL_X_THRESH = 0.7;
@@ -143,6 +144,25 @@ float prev_accel_z = 0.0;
 
 // Threshold for change in acceleration
 const float ACCEL_CHANGE_THRESH = 0.1; // Adjust this value as needed
+
+#elif CUSTOM_BOARD_V5
+//These are just random values. We can change them later (z accel is higher since its experiencing 9.8 g
+// at least in the mounting position of usb port down like we did during the semester)
+const float MPU_ACCEL_X_THRESH = 0.7;
+const float MPU_ACCEL_Y_THRESH = 11;
+const float MPU_ACCEL_Z_THRESH = 0.20;
+const float MPU_GYRO_X_THRESH = 2;
+const float MPU_GYRO_Y_THRESH = 2;
+const float MPU_GYRO_Z_THRESH = 2;
+
+// Global variables to store previous acceleration values
+float prev_accel_x = 0.0;
+float prev_accel_y = 0.0;
+float prev_accel_z = 0.0;
+
+// Threshold for change in acceleration
+const float ACCEL_CHANGE_THRESH = 0.1; // Adjust this value as needed
+#endif
 
 bool motion_detected(ICM42670 &IMU, int accelRange, int gyroRange) {
 
@@ -175,12 +195,23 @@ bool motion_detected(ICM42670 &IMU, int accelRange, int gyroRange) {
     prev_accel_y = accelY_mps2;
     prev_accel_z = accelZ_mps2;
 
+    //macro is used since the accelerometer is oriented in a different direction between the two boards
+    //TODO remove this later once the V4 board is no longer used in production for easier maintainability
+    #ifdef CUSTOM_BOARD_V4
     if (abs(accelZ_mps2) >= MPU_ACCEL_Z_THRESH || delta_x >= ACCEL_CHANGE_THRESH ||
         delta_y >= ACCEL_CHANGE_THRESH || delta_z >= ACCEL_CHANGE_THRESH) {
         return true;
     } else {
         return false;
     }
+    #elif CUSTOM_BOARD_V5
+    if (abs(accelZ_mps2) >= MPU_ACCEL_Z_THRESH || delta_x >= ACCEL_CHANGE_THRESH ||
+        delta_y >= ACCEL_CHANGE_THRESH || delta_z >= ACCEL_CHANGE_THRESH) {
+        return true;
+    } else {
+        return false;
+    }
+    #endif
 }
 
 #endif
