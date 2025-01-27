@@ -17,7 +17,7 @@
 int boardVersion = BOARD_VERSION;
 
 //Firmware version
-String FIRMWARE_VERSION = "1-6-4";
+String FIRMWARE_VERSION = "1-7-0";
 int firstHyphen = FIRMWARE_VERSION.indexOf('-');
 int secondHyphen = FIRMWARE_VERSION.indexOf('-', firstHyphen + 1);
 
