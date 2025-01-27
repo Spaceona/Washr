@@ -1,3 +1,4 @@
+
 name: Build and Release Firmware
 
 on:
@@ -45,7 +46,7 @@ jobs:
             #endif //WIFI_SECRETS_H
           EOF
       - name: Compile firmware for all environments
-        run: pio run -e $(pio project config --json-output | jq -r '.envs[]' | tr '\n' ' ')
+        run: pio run
 
       - name: Create Release
         id: create_release
@@ -55,7 +56,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}
-          draft: true
+          draft: false
           prerelease: false
 
       - name: Upload firmware for seeed_xiao_esp32c3
@@ -65,8 +66,13 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: .pio/build/seeed_xiao_esp32c3/firmware.bin
-          asset_name: ${{ github.ref_name.replace('v', '').replace('.', '-') }}_v3.bin
+          asset_name: seeed_xiao_esp32c3_firmware.bin
           asset_content_type: application/octet-stream
+
+      - name: Set asset name for seeed_xiao_esp32c3
+        run: |
+          asset_name=$(echo ${{ github.ref_name }} | sed 's/v//g' | sed 's/\./-/g')_v3.bin
+          echo "asset_name=${asset_name}" >> $GITHUB_ENV
 
       - name: Upload firmware for custom-board-v4
         uses: actions/upload-release-asset@v1
@@ -75,8 +81,13 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: .pio/build/custom-board-v4/firmware.bin
-          asset_name: ${{ github.ref_name.replace('v', '').replace('.', '-') }}_v4.bin
+          asset_name: custom-board-v4_firmware.bin
           asset_content_type: application/octet-stream
+
+      - name: Set asset name for custom-board-v4
+        run: |
+          asset_name=$(echo ${{ github.ref_name }} | sed 's/v//g' | sed 's/\./-/g')_v4.bin
+          echo "asset_name=${asset_name}" >> $GITHUB_ENV
 
       - name: Upload firmware for custom-board-v5
         uses: actions/upload-release-asset@v1
@@ -85,5 +96,10 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: .pio/build/custom-board-v5/firmware.bin
-          asset_name: ${{ github.ref_name.replace('v', '').replace('.', '-') }}_v5.bin
+          asset_name: custom-board-v5_firmware.bin
           asset_content_type: application/octet-stream
+
+      - name: Set asset name for custom-board-v5
+        run: |
+          asset_name=$(echo ${{ github.ref_name }} | sed 's/v//g' | sed 's/\./-/g')_v5.bin
+          echo "asset_name=${asset_name}" >> $GITHUB_ENV
