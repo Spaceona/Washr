@@ -14,6 +14,8 @@
 #include <Preferences.h>
 #include "wifi_secrets.h"
 
+
+extern int boardVersion;
 extern String FIRMWARE_VERSION;
 extern const int FIRMWARE_VERSION_MAJOR;
 extern const int FIRMWARE_VERSION_MINOR;
