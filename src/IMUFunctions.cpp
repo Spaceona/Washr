@@ -175,7 +175,7 @@ bool motion_detected(ICM42670 &IMU, int accelRange, int gyroRange) {
     prev_accel_y = accelY_mps2;
     prev_accel_z = accelZ_mps2;
 
-    if (abs(accelZ_mps2) >= MPU_ACCEL_Z_THRESH || delta_x >= ACCEL_CHANGE_THRESH ||
+    if (delta_x >= ACCEL_CHANGE_THRESH ||
         delta_y >= ACCEL_CHANGE_THRESH || delta_z >= ACCEL_CHANGE_THRESH) {
         return true;
     } else {
