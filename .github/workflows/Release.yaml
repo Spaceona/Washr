@@ -1,83 +1,83 @@
-#name: Build and Release Firmware
-#
-#on:
-#  push:
-#    branches:
-#      - main
-#
-#jobs:
-#  build:
-#    if: startsWith(github.ref, 'refs/tags/')
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v3
-#
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.11'
-#
-#      - name: Install PlatformIO
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install platformio
-#      - name: wifi creds #temp fix while bluetooth onboarding isn't implemented
-#        run: touch ./include/wifi_secrets.h
-#      - name: add dummy stuff
-#        run: |
-#          cat <<-EOF > ./include/wifi_secrets.h
-#            #ifndef WIFI_SECRETS_H
-#            #define WIFI_SECRETS_H
-#
-#            #define WIFI_SSID ""
-#            #define WIFI_PASSWORD ""
-#            #define CLIENT_NAME ""
-#            #define CLIENT_KEY ""
-#
-#            #endif //WIFI_SECRETS_H
-#          EOF
-#      - name: Compile firmware for all environments
-#        run: pio run --environment seeed_xiao_esp32c3 --environment custom-board-v4 --environment custom-board-v5
-#
-#      - name: Create Release
-#        id: create_release
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: ${{ github.ref_name }}
-#          release_name: Release ${{ github.ref_name }}
-#          draft: true
-#          prerelease: false
-#
-#      - name: Upload firmware for seeed_xiao_esp32c3
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: .pio/build/seeed_xiao_esp32c3/firmware.bin
-#          asset_name: ${{ github.ref_name.replace('v', '').replace('.', '-') }}_v3.bin
-#          asset_content_type: application/octet-stream
-#
-#      - name: Upload firmware for custom-board-v4
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: .pio/build/custom-board-v4/firmware.bin
-#          asset_name: ${{ github.ref_name.replace('v', '').replace('.', '-') }}_v4.bin
-#          asset_content_type: application/octet-stream
-#
-#      - name: Upload firmware for custom-board-v5
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: .pio/build/custom-board-v5/firmware.bin
-#          asset_name: ${{ github.ref_name.replace('v', '').replace('.', '-') }}_v5.bin
-#          asset_content_type: application/octet-stream
+name: Build and Release Firmware
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install platformio
+      - name: wifi creds #temp fix while bluetooth onboarding isn't implemented
+        run: touch ./include/wifi_secrets.h
+      - name: add dummy stuff
+        run: |
+          cat <<-EOF > ./include/wifi_secrets.h
+            #ifndef WIFI_SECRETS_H
+            #define WIFI_SECRETS_H
+
+            #define WIFI_SSID ""
+            #define WIFI_PASSWORD ""
+            #define CLIENT_NAME ""
+            #define CLIENT_KEY ""
+
+            #endif //WIFI_SECRETS_H
+          EOF
+      - name: Compile firmware for all environments
+        run: pio run --environment seeed_xiao_esp32c3 --environment custom-board-v4 --environment custom-board-v5
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: true
+          prerelease: false
+
+      - name: Upload firmware for seeed_xiao_esp32c3
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: .pio/build/seeed_xiao_esp32c3/firmware.bin
+          asset_name: ${{ github.ref_name.replace('v', '').replace('.', '-') }}_v3.bin
+          asset_content_type: application/octet-stream
+
+      - name: Upload firmware for custom-board-v4
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: .pio/build/custom-board-v4/firmware.bin
+          asset_name: ${{ github.ref_name.replace('v', '').replace('.', '-') }}_v4.bin
+          asset_content_type: application/octet-stream
+
+      - name: Upload firmware for custom-board-v5
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: .pio/build/custom-board-v5/firmware.bin
+          asset_name: ${{ github.ref_name.replace('v', '').replace('.', '-') }}_v5.bin
+          asset_content_type: application/octet-stream
