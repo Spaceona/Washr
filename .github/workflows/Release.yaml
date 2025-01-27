@@ -2,8 +2,8 @@ name: Build and Release Firmware
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -39,7 +39,7 @@ jobs:
             #endif //WIFI_SECRETS_H
           EOF
       - name: Compile firmware for all environments
-        run: pio run --environment seeed_xiao_esp32c3 --environment custom-board-v4 --environment custom-board-v5
+        run: pio run -e $(pio project config --json-output | jq -r '.envs[]' | tr '\n' ' ')
 
       - name: Create Release
         id: create_release
