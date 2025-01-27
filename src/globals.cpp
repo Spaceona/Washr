@@ -12,12 +12,19 @@
 #include "flashStorage.h"
 #include "globals.h"
 
+//Board Version
+//Used to determine which board is being used. Must be correct at compile time
+int boardVersion = BOARD_VERSION;
+
 //Firmware version
 String FIRMWARE_VERSION = "1-6-4";
-//TODO fix this for double digit values
-const int FIRMWARE_VERSION_MAJOR = FIRMWARE_VERSION.substring(0, 1).toInt();
-const int FIRMWARE_VERSION_MINOR = FIRMWARE_VERSION.substring(2, 3).toInt();
-const int FIRMWARE_VERSION_PATCH = FIRMWARE_VERSION.substring(4, 5).toInt();
+int firstHyphen = FIRMWARE_VERSION.indexOf('-');
+int secondHyphen = FIRMWARE_VERSION.indexOf('-', firstHyphen + 1);
+
+// Extract the major, minor, and patch versions
+const int FIRMWARE_VERSION_MAJOR = FIRMWARE_VERSION.substring(0, firstHyphen).toInt();
+const int FIRMWARE_VERSION_MINOR = FIRMWARE_VERSION.substring(firstHyphen + 1, secondHyphen).toInt();
+const int FIRMWARE_VERSION_PATCH = FIRMWARE_VERSION.substring(secondHyphen + 1).toInt();
 
 //Setting up the timezone for ezTime
 Timezone myTimezone;
